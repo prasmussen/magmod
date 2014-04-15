@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<config>
+  <modules>
+    <{{namespace}}_{{name}}>
+      <version>1.0.0</version>
+    </{{namespace}}_{{name}}>
+  </modules>
+</config>
