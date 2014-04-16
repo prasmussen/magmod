@@ -3,7 +3,7 @@ module Magento.Module (
     createConfigXml
 ) where
 
-import System.Directory (createDirectoryIfMissing, renameFile, removeFile)
+import System.Directory (createDirectoryIfMissing)
 import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Module (moduleXml)
 import Template.Config (configXml)
