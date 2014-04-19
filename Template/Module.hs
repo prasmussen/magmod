@@ -5,7 +5,7 @@ module Template.Module (
 ) where
 
 import Text.Hastache.Context (mkGenericContext)
-import Template.Template (content, render)
+import Template (content, render)
 import Data.Data (Data, Typeable)
 
 data ModuleTemplate = ModuleTemplate {

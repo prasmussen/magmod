@@ -1,14 +1,21 @@
 module Magento.Module (
     createModuleXml,
-    createConfigXml
+    createConfigXml,
+    findConfigXml
 ) where
 
 import System.Directory (createDirectoryIfMissing)
 import System.FilePath.Posix (joinPath, takeDirectory)
+import Data.Functor ((<$>))
+import System.FilePath.Find (find, always, fileName, (==?))
 import Template.Module (moduleXml)
 import Template.Config (configXml)
-import Util (capitalize, lowercase)
+import Util (capitalize, lowercase, ensureSinglePath)
 
+
+findConfigXml :: IO (Maybe FilePath)
+findConfigXml =
+    ensureSinglePath <$> find always (fileName ==? "config.xml") "."
 
 moduleXmlFname :: String -> String -> String
 moduleXmlFname namespace name =
