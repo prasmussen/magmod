@@ -1,5 +1,6 @@
 module Util (
     capitalize,
+    capitalizePath,
     lowercase,
     ensureSinglePath,
     tmpFname,
@@ -9,7 +10,11 @@ module Util (
 
 import Data.Char (toUpper, toLower)
 import System.Directory (renameFile, copyFile)
-import System.FilePath.Posix (joinPath, takeDirectory, takeBaseName)
+import System.FilePath.Posix (
+    joinPath,
+    splitPath,
+    takeDirectory,
+    takeBaseName)
 
 
 lowercase :: String -> String
@@ -19,6 +24,10 @@ capitalize :: String -> String
 capitalize word = case word of
     [] -> []
     (x:xs) -> toUpper x:map toLower xs
+
+capitalizePath :: FilePath -> FilePath
+capitalizePath path =
+    joinPath $ map capitalize $ splitPath path
 
 ensureSinglePath :: [FilePath] -> Maybe FilePath
 ensureSinglePath paths =

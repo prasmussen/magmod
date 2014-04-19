@@ -1,5 +1,5 @@
 <helpers>
   <{{name}}>
-    <class>{{className}}</class>
+    <class>{{classNamePrefix}}</class>
   </{{name}}>
 </helpers>

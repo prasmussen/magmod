@@ -1,14 +1,8 @@
 import System.Environment (getArgs)
-import Magento.Module (createModuleXml, createConfigXml, findConfigXml)
+import Magento.Module (newModule, findConfigXml)
 import Magento.Module.XML (readNamespaceAndName)
-import Magento.Helper (insertHelperXmlIfMissing)
+import Magento.Helper (addHelper)
 import System.Exit (exitFailure)
-
-dispatch :: [String] -> IO ()
-dispatch ["new", namespace, name, codepool] = new namespace name codepool
-dispatch ["add", "helper", name] = addHelper name
-dispatch ["help"] = help
-dispatch args = putStrLn "No match"
 
 
 main :: IO ()
@@ -16,21 +10,30 @@ main = do
     args <- getArgs
     dispatch args
 
-help :: IO ()
-help = putStrLn "Such helpful"
+dispatch :: [String] -> IO ()
+dispatch args =
+    case args of
+        ["new", namespace, name, codepool] ->
+            newModuleHandler namespace name codepool
+        ["add", "helper", name] ->
+            addHelperHandler name
+        ["help"] ->
+            helpHandler
+        _ -> do
+            putStrLn "No match"
+            exitFailure
 
-addHelper :: String -> IO ()
-addHelper helperName = do
-    isInsideModule (\path namespace moduleName -> do
-        insertHelperXmlIfMissing path namespace moduleName)
-    putStrLn "Done"
+helpHandler :: IO ()
+helpHandler = putStrLn "Such helpful"
 
-new :: String -> String -> String -> IO ()
-new namespace name codepool = do
-    createModuleXml namespace name codepool
-    createConfigXml namespace name codepool
-    putStrLn "Done"
+addHelperHandler :: String -> IO ()
+addHelperHandler helperName =
+    isInsideModule (\configXmlPath namespace moduleName ->
+        addHelper configXmlPath namespace moduleName helperName)
 
+newModuleHandler :: String -> String -> String -> IO ()
+newModuleHandler namespace name codepool =
+    newModule namespace name codepool
 
 isInsideModule :: (FilePath -> String -> String -> IO ()) -> IO ()
 isInsideModule f = do
@@ -39,5 +42,6 @@ isInsideModule f = do
         Just path -> do
             (namespace, name) <- readNamespaceAndName path
             f path namespace name
-        Nothing ->
+        Nothing -> do
             putStrLn "Found none or more than one config.xml"
+            exitFailure

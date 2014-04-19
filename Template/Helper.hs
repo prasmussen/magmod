@@ -1,19 +1,29 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 
 module Template.Helper (
-    helperXml
+    helperXml,
+    helperPhp
 ) where
 
 import Text.Hastache.Context (mkGenericContext)
 import Template (content, render)
 import Data.Data (Data, Typeable)
 
-data HelperTemplate = HelperTemplate {
+data HelperXmlTemplate = HelperXmlTemplate {
     name :: String,
+    classNamePrefix :: String
+} deriving (Data, Typeable)
+
+data HelperPhpTemplate = HelperPhpTemplate {
     className :: String
 } deriving (Data, Typeable)
 
 helperXml :: String -> String -> IO String
-helperXml name className = render
+helperXml name classNamePrefix = render
     (content "helper.xml")
-    (mkGenericContext $ HelperTemplate name className)
+    (mkGenericContext $ HelperXmlTemplate name classNamePrefix)
+
+helperPhp :: String -> IO String
+helperPhp className = render
+    (content "helper.php")
+    (mkGenericContext $ HelperPhpTemplate className)

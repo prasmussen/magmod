@@ -1,7 +1,7 @@
 module Magento.Module (
-    createModuleXml,
-    createConfigXml,
-    findConfigXml
+    newModule,
+    findConfigXml,
+    codeRootPath
 ) where
 
 import System.Directory (createDirectoryIfMissing)
@@ -13,9 +13,18 @@ import Template.Config (configXml)
 import Util (capitalize, lowercase, ensureSinglePath)
 
 
+newModule :: String -> String -> String -> IO ()
+newModule namespace name codepool = do
+    createModuleXml namespace name codepool
+    createConfigXml namespace name codepool
+
 findConfigXml :: IO (Maybe FilePath)
 findConfigXml =
     ensureSinglePath <$> find always (fileName ==? "config.xml") "."
+
+codeRootPath :: FilePath -> FilePath
+codeRootPath configXmlPath =
+    joinPath [takeDirectory configXmlPath, ".."]
 
 moduleXmlFname :: String -> String -> String
 moduleXmlFname namespace name =
