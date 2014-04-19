@@ -1,0 +1,5 @@
+<models>
+  <{{name}}>
+    <class>{{classNamePrefix}}</class>
+  </{{name}}>
+</models>

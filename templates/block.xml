@@ -1,0 +1,5 @@
+<blocks>
+  <{{name}}>
+    <class>{{classNamePrefix}}</class>
+  </{{name}}>
+</blocks>
