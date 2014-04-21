@@ -4,6 +4,7 @@ import Magento.Module.XML (readNamespaceAndName)
 import Magento.Helper (addHelper)
 import Magento.Model (addModel)
 import Magento.Block (addBlock)
+import Magento.Observer (addObserver)
 import System.Exit (exitFailure)
 
 
@@ -23,6 +24,8 @@ dispatch args =
             addModelHandler name
         ["add", "block", name] ->
             addBlockHandler name
+        ["add", "observer", scope, eventName] ->
+            addObserverHandler scope eventName
         ["help"] ->
             helpHandler
         _ -> do
@@ -50,6 +53,11 @@ addBlockHandler :: String -> IO ()
 addBlockHandler blockName =
     isInsideModule (\configXmlPath namespace moduleName ->
         addBlock configXmlPath namespace moduleName blockName)
+
+addObserverHandler :: String -> String -> IO ()
+addObserverHandler scope eventName =
+    isInsideModule (\configXmlPath namespace moduleName ->
+        addObserver configXmlPath namespace moduleName scope eventName)
 
 isInsideModule :: (FilePath -> String -> String -> IO ()) -> IO ()
 isInsideModule f = do

@@ -1,0 +1,9 @@
+<{{eventName}}>
+  <observers>
+    <{{moduleName}}>
+      <type>singelton</type>
+      <class>{{moduleName}}/observer</class>
+      <method>{{methodName}}</method>
+    </{{moduleName}}>
+  </observers>
+</{{eventName}}>

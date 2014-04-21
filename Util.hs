@@ -2,12 +2,14 @@ module Util (
     capitalize,
     capitalizePath,
     lowercase,
+    camelcase,
     ensureSinglePath,
     tmpFname,
     backupFname,
     renameWithBackup
 ) where
 
+import Data.String.Utils (join, split)
 import Data.Char (toUpper, toLower)
 import System.Directory (renameFile, copyFile)
 import System.FilePath.Posix (
@@ -28,6 +30,11 @@ capitalize word = case word of
 capitalizePath :: FilePath -> FilePath
 capitalizePath path =
     joinPath $ map capitalize $ splitPath path
+
+camelcase :: String -> String
+camelcase str =
+    let xs = split "_" str in
+    join "" $ lowercase (head xs) : (map capitalize $ tail xs)
 
 ensureSinglePath :: [FilePath] -> Maybe FilePath
 ensureSinglePath paths =
