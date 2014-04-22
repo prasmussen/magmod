@@ -2,74 +2,46 @@ module Magento.Observer (
     addObserver
 ) where
 
-import System.Directory (createDirectoryIfMissing, doesFileExist)
-import System.FilePath.Posix (joinPath, takeDirectory, takeBaseName)
+import System.FilePath.Posix (joinPath)
 import Template.Observer (observerXml, observerPhp)
+import Magento.Model (addModel)
 import Magento.Module (codeRootPath)
-import Util (capitalize,
-    capitalizePath,
-    lowercase,
-    camelcase,
-    tmpFname,
-    renameWithBackup)
+import Util (camelcase)
 import Util.XML (insertXmlIfMissing)
-import Data.String.Utils (replace, join)
+import Util.PHP (insertPhpMethod)
+import Data.String.Utils (join)
 
 addObserver :: FilePath -> String -> String -> String -> String -> IO ()
 addObserver configXmlPath namespace moduleName scope eventName = do
     insertObserverXmlIfMissing configXmlPath moduleName scope eventName
-    --createObserverPhpIfMissing configXmlPath namespace moduleName observerName
+    createObserverPhpIfMissing configXmlPath namespace moduleName eventName
 
 insertObserverXmlIfMissing :: FilePath -> String -> String -> String -> IO ()
 insertObserverXmlIfMissing configXmlPath moduleName scope eventName = do
     let xpath = join "" ["/config/", scope, "/events/", eventName]
-    xml <- (observerXml moduleName eventName (methodName eventName))
+    xml <- (observerXml moduleName eventName (composeMethodName eventName))
     insertXmlIfMissing configXmlPath xpath xml
 
-methodName :: String -> String
-methodName eventName = camelcase eventName
+composeMethodName :: String -> String
+composeMethodName eventName = camelcase eventName
 
-composeObserverPhpPath :: FilePath -> String -> String
-composeObserverPhpPath configXmlPath observerName =
+composeObserverPhpPath :: FilePath -> String
+composeObserverPhpPath configXmlPath =
     joinPath [
         codeRootPath configXmlPath,
-        "Observer",
-        (capitalizePath observerName) ++ ".php"
+        "Model",
+        "Observer.php"
     ]
 
 createObserverPhpIfMissing :: FilePath -> String -> String -> String -> IO ()
-createObserverPhpIfMissing configXmlPath namespace moduleName observerName =
-    let observerPhpPath = composeObserverPhpPath configXmlPath observerName
-    in do
-        createDirectoryIfMissing True (takeDirectory observerPhpPath)
-        writeObserverPhpIfMissing observerPhpPath namespace moduleName observerName
+createObserverPhpIfMissing configXmlPath namespace moduleName eventName = do
+    -- Add observer model
+    addModel configXmlPath namespace moduleName "Observer"
+    insertObserverPhp
+        (composeObserverPhpPath configXmlPath)
+        (composeMethodName eventName)
 
-writeObserverPhpIfMissing :: FilePath -> String -> String -> String -> IO ()
-writeObserverPhpIfMissing path namespace moduleName observerName = do
-    exists <- doesFileExist path
-    case exists of
-        False -> writeObserverPhp path namespace moduleName observerName
-        True -> return ()
-
-writeObserverPhp :: FilePath -> String -> String -> String -> IO ()
-writeObserverPhp path namespace moduleName observerName = do
-    php <- observerPhp $ className namespace moduleName observerName
-    writeFile path php
-
-classNamePrefix :: String -> String -> String
-classNamePrefix namespace moduleName =
-    foldl (++) "" [
-        capitalize namespace,
-        "_",
-        capitalize moduleName,
-        "_",
-        "Observer"
-    ]
-
-className :: String -> String -> String -> String
-className namespace moduleName observerName =
-    foldl (++) "" [
-        classNamePrefix namespace moduleName,
-        "_",
-        replace "/" "_" $ capitalizePath observerName
-    ]
+insertObserverPhp :: FilePath -> String -> IO ()
+insertObserverPhp modelPath methodName = do
+    php <- observerPhp methodName
+    insertPhpMethod modelPath php
