@@ -4,7 +4,7 @@ module Magento.Module (
     codeRootPath
 ) where
 
-import System.Directory (createDirectoryIfMissing)
+import System.Directory (createDirectoryIfMissing, doesDirectoryExist)
 import System.FilePath.Posix (joinPath, takeDirectory)
 import Data.Functor ((<$>))
 import System.FilePath.Find (find, always, fileName, (==?))
@@ -15,8 +15,13 @@ import Util (capitalize, lowercase, ensureSinglePath)
 
 newModule :: String -> String -> String -> IO ()
 newModule namespace name codepool = do
-    createModuleXml namespace name codepool
-    createConfigXml namespace name codepool
+    exists <- doesDirectoryExist $ lowercase name
+    case exists of
+        True ->
+            putStrLn "A directory with that name already exists"
+        False -> do
+            createModuleXml namespace name codepool
+            createConfigXml namespace name codepool
 
 findConfigXml :: IO (Maybe FilePath)
 findConfigXml =
