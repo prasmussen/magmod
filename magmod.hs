@@ -1,4 +1,4 @@
-import System.Environment (getArgs)
+import System.Environment (getArgs, getProgName)
 import Magento.Module (newModule, findConfigXml)
 import Magento.Module.XML (readNamespaceAndName)
 import Magento.Helper (addHelper)
@@ -29,11 +29,18 @@ dispatch args =
         ["help"] ->
             helpHandler
         _ -> do
-            putStrLn "No match"
+            putStrLn "Invalid arguments, use 'help' to see available commands"
             exitFailure
 
 helpHandler :: IO ()
-helpHandler = putStrLn "Such helpful"
+helpHandler = do
+    name <- getProgName
+    mapM_ (putStrLn . (name ++) . (" " ++)) [
+        "new <namespace> <name> <codepool>",
+        "add helper <name>",
+        "add model <name>",
+        "add block <name>",
+        "add observer <scope> <event_name>"]
 
 newModuleHandler :: String -> String -> String -> IO ()
 newModuleHandler namespace name codepool =
