@@ -5,8 +5,7 @@ module Template.Observer (
     observerPhp
 ) where
 
-import Text.Hastache.Context (mkGenericContext)
-import Template (content, render)
+import Template (render)
 import Data.Data (Data, Typeable)
 
 data ObserverTemplate = ObserverTemplate {
@@ -16,11 +15,9 @@ data ObserverTemplate = ObserverTemplate {
 } deriving (Data, Typeable)
 
 observerXml :: String -> String -> String -> IO String
-observerXml moduleName eventName methodName = render
-    (content "observer.xml")
-    (mkGenericContext $ ObserverTemplate moduleName eventName methodName)
+observerXml moduleName eventName methodName =
+    render "observer.xml" (ObserverTemplate moduleName eventName methodName)
 
 observerPhp :: String -> IO String
-observerPhp methodName = render
-    (content "observer.php")
-    (mkGenericContext $ ObserverTemplate "" "" methodName)
+observerPhp methodName =
+    render "observer.php" (ObserverTemplate "" "" methodName)

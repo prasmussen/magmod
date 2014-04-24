@@ -5,8 +5,7 @@ module Template.Model (
     modelPhp
 ) where
 
-import Text.Hastache.Context (mkGenericContext)
-import Template (content, render)
+import Template (render)
 import Data.Data (Data, Typeable)
 
 data ModelXmlTemplate = ModelXmlTemplate {
@@ -19,11 +18,9 @@ data ModelPhpTemplate = ModelPhpTemplate {
 } deriving (Data, Typeable)
 
 modelXml :: String -> String -> IO String
-modelXml name classNamePrefix = render
-    (content "model.xml")
-    (mkGenericContext $ ModelXmlTemplate name classNamePrefix)
+modelXml name classNamePrefix =
+    render "model.xml" (ModelXmlTemplate name classNamePrefix)
 
 modelPhp :: String -> IO String
-modelPhp className = render
-    (content "model.php")
-    (mkGenericContext $ ModelPhpTemplate className)
+modelPhp className =
+    render "model.php" (ModelPhpTemplate className)

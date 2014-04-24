@@ -5,27 +5,24 @@ module Template.Controller (
     controllerPhp
 ) where
 
-import Text.Hastache.Context (mkGenericContext)
-import Template (content, render)
+import Template (render)
 import Data.Data (Data, Typeable)
 
-data ControllerXmlTemplate = ControllerXmlTemplate {
+data CtrlXmlTemplate = CtrlXmlTemplate {
     moduleName :: String,
     fullModuleName :: String,
     router :: String
 } deriving (Data, Typeable)
 
-data ControllerPhpTemplate = ControllerPhpTemplate {
+data CtrlPhpTemplate = CtrlPhpTemplate {
     className :: String,
     parentClassName :: String
 } deriving (Data, Typeable)
 
 controllerXml :: String -> String -> String -> IO String
-controllerXml moduleName fullModuleName router = render
-    (content "controller.xml")
-    (mkGenericContext $ ControllerXmlTemplate moduleName fullModuleName router)
+controllerXml moduleName fullModuleName router =
+    render "controller.xml" (CtrlXmlTemplate moduleName fullModuleName router)
 
 controllerPhp :: String -> String -> IO String
-controllerPhp className parentClassName = render
-    (content "controller.php")
-    (mkGenericContext $ ControllerPhpTemplate className parentClassName)
+controllerPhp className parentClassName =
+    render "controller.php" (CtrlPhpTemplate className parentClassName)

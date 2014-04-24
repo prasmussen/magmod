@@ -4,8 +4,7 @@ module Template.Module (
     moduleXml
 ) where
 
-import Text.Hastache.Context (mkGenericContext)
-import Template (content, render)
+import Template (render)
 import Data.Data (Data, Typeable)
 
 data ModuleTemplate = ModuleTemplate {
@@ -15,7 +14,6 @@ data ModuleTemplate = ModuleTemplate {
 } deriving (Data, Typeable)
 
 moduleXml :: String -> String -> String -> IO String
-moduleXml namespace name codepool = render
-    (content "module.xml")
-    (mkGenericContext $ ModuleTemplate namespace name codepool)
+moduleXml namespace name codepool =
+    render "module.xml" (ModuleTemplate namespace name codepool)
 

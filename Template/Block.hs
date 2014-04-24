@@ -5,8 +5,7 @@ module Template.Block (
     blockPhp
 ) where
 
-import Text.Hastache.Context (mkGenericContext)
-import Template (content, render)
+import Template (render)
 import Data.Data (Data, Typeable)
 
 data BlockXmlTemplate = BlockXmlTemplate {
@@ -19,11 +18,9 @@ data BlockPhpTemplate = BlockPhpTemplate {
 } deriving (Data, Typeable)
 
 blockXml :: String -> String -> IO String
-blockXml name classNamePrefix = render
-    (content "block.xml")
-    (mkGenericContext $ BlockXmlTemplate name classNamePrefix)
+blockXml name classNamePrefix =
+    render "block.xml" (BlockXmlTemplate name classNamePrefix)
 
 blockPhp :: String -> IO String
-blockPhp className = render
-    (content "block.php")
-    (mkGenericContext $ BlockPhpTemplate className)
+blockPhp className =
+    render "block.php" (BlockPhpTemplate className)
