@@ -1,0 +1,9 @@
+<routers>
+  <{{moduleName}}>
+    <use>{{router}}</use>
+    <args>
+      <module>{{fullModuleName}}</module>
+      <frontName>{{moduleName}}</frontName>
+    </args>
+  </{{moduleName}}>
+</routers>
