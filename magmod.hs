@@ -15,25 +15,24 @@ main = do
     dispatch args
 
 dispatch :: [String] -> IO ()
-dispatch args =
-    case args of
-        ["new", namespace, name, codepool] ->
-            newModuleHandler namespace name codepool
-        ["add", "helper", name] ->
-            addHelperHandler name
-        ["add", "model", name] ->
-            addModelHandler name
-        ["add", "block", name] ->
-            addBlockHandler name
-        ["add", "controller", scope, name] ->
-            addControllerHandler scope name
-        ["add", "observer", scope, eventName] ->
-            addObserverHandler scope eventName
-        ["help"] ->
-            helpHandler
-        _ -> do
-            putStrLn "Invalid arguments, use 'help' to see available commands"
-            exitFailure
+dispatch args = case args of
+    ["new", namespace, name, codepool] ->
+        newModuleHandler namespace name codepool
+    ["add", "helper", name] ->
+        addHelperHandler name
+    ["add", "model", name] ->
+        addModelHandler name
+    ["add", "block", name] ->
+        addBlockHandler name
+    ["add", "controller", scope, name] ->
+        addControllerHandler scope name
+    ["add", "observer", scope, eventName] ->
+        addObserverHandler scope eventName
+    ["help"] ->
+        helpHandler
+    _ -> do
+        putStrLn "Invalid arguments, use 'help' to see available commands"
+        exitFailure
 
 helpHandler :: IO ()
 helpHandler = do
