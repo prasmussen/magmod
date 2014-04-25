@@ -16,18 +16,26 @@ main = do
 
 dispatch :: [String] -> IO ()
 dispatch args = case args of
-    ["new", namespace, name, codepool] ->
-        newModuleHandler namespace name codepool
+    ["new", "local", namespace, name] ->
+        newModuleHandler "local" namespace name
+    ["new", "community", namespace, name] ->
+        newModuleHandler "community" namespace name
     ["add", "helper", name] ->
         addHelperHandler name
     ["add", "model", name] ->
         addModelHandler name
     ["add", "block", name] ->
         addBlockHandler name
-    ["add", "controller", scope, name] ->
-        addControllerHandler scope name
-    ["add", "observer", scope, eventName] ->
-        addObserverHandler scope eventName
+    ["add", "controller", "frontend", name] ->
+        addControllerHandler "frontend" name
+    ["add", "controller", "admin", name] ->
+        addControllerHandler "admin" name
+    ["add", "observer", "frontend", eventName] ->
+        addObserverHandler "frontend" eventName
+    ["add", "observer", "admin", eventName] ->
+        addObserverHandler "admin" eventName
+    ["add", "observer", "global", eventName] ->
+        addObserverHandler "global" eventName
     ["help"] ->
         helpHandler
     _ -> do
@@ -38,7 +46,7 @@ helpHandler :: IO ()
 helpHandler = do
     name <- getProgName
     mapM_ (putStrLn . (name ++) . (" " ++)) [
-        "new <namespace> <name> <codepool>",
+        "new <codepool> <namespace> <name>",
         "add helper <name>",
         "add model <name>",
         "add block <name>",
@@ -46,8 +54,8 @@ helpHandler = do
         "add observer <scope> <event_name>"]
 
 newModuleHandler :: String -> String -> String -> IO ()
-newModuleHandler namespace name codepool =
-    newModule namespace name codepool
+newModuleHandler codepool namespace name =
+    newModule codepool namespace name
 
 addHelperHandler :: String -> IO ()
 addHelperHandler helperName =
@@ -65,7 +73,7 @@ addBlockHandler blockName =
         addBlock configXmlPath namespace moduleName blockName)
 
 addControllerHandler :: String -> String -> IO ()
-addControllerHandler controllerName scope =
+addControllerHandler scope controllerName =
     isInsideModule (\configXmlPath namespace moduleName ->
         addController configXmlPath namespace moduleName scope controllerName)
 

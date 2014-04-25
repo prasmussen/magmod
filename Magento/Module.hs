@@ -14,14 +14,14 @@ import Util (capitalize, lowercase, ensureSinglePath)
 
 
 newModule :: String -> String -> String -> IO ()
-newModule namespace name codepool = do
+newModule codepool namespace name = do
     exists <- doesDirectoryExist $ lowercase name
     case exists of
         True ->
             putStrLn "A directory with that name already exists"
         False -> do
-            createModuleXml namespace name codepool
-            createConfigXml namespace name codepool
+            createModuleXml codepool namespace name
+            createConfigXml codepool namespace name
 
 findConfigXml :: IO (Maybe FilePath)
 findConfigXml =
@@ -64,11 +64,11 @@ composeConfigXmlPath codepool namespace name =
     ]
 
 writeModuleXml :: String -> String -> String -> String -> IO ()
-writeModuleXml path namespace name codepool = do
+writeModuleXml path codepool namespace name = do
     xml <- moduleXml
+        (lowercase codepool)
         (lowercase namespace)
         (lowercase name)
-        (lowercase codepool)
     writeFile path xml
 
 writeConfigXml :: String -> String -> String -> IO ()
@@ -79,14 +79,14 @@ writeConfigXml path namespace name = do
     writeFile path xml
 
 createModuleXml :: String -> String -> String -> IO ()
-createModuleXml namespace name codepool =
+createModuleXml codepool namespace name =
     let moduleXmlPath = composeModuleXmlPath namespace name
     in do
         createDirectoryIfMissing True (takeDirectory moduleXmlPath)
-        writeModuleXml moduleXmlPath namespace name codepool
+        writeModuleXml moduleXmlPath codepool namespace name
 
 createConfigXml :: String -> String -> String -> IO ()
-createConfigXml namespace name codepool =
+createConfigXml codepool namespace name =
     let configXmlPath = composeConfigXmlPath codepool namespace name
     in do
         createDirectoryIfMissing True (takeDirectory configXmlPath)

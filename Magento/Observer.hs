@@ -18,12 +18,17 @@ addObserver configXmlPath namespace moduleName scope eventName = do
 
 insertObserverXmlIfMissing :: FilePath -> String -> String -> String -> IO ()
 insertObserverXmlIfMissing configXmlPath moduleName scope eventName = do
-    let xpath = join "" ["/config/", scope, "/events/", eventName]
+    let xpath = join "" ["/config/", scopeName scope, "/events/", eventName]
     xml <- (observerXml moduleName eventName (composeMethodName eventName))
     insertXmlIfMissing configXmlPath xpath xml
 
 composeMethodName :: String -> String
 composeMethodName eventName = camelcase eventName
+
+scopeName :: String -> String
+scopeName "frontend" = "frontend"
+scopeName "admin" = "adminhtml"
+scopeName "global" = "global"
 
 composeObserverPhpPath :: FilePath -> String
 composeObserverPhpPath configXmlPath =
