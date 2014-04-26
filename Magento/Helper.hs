@@ -2,6 +2,7 @@ module Magento.Helper (
     addHelper
 ) where
 
+import Control.Monad (when)
 import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Helper (helperXml, helperPhp)
@@ -44,9 +45,8 @@ createHelperPhpIfMissing configXmlPath namespace moduleName helperName =
 writeHelperPhpIfMissing :: FilePath -> String -> String -> String -> IO ()
 writeHelperPhpIfMissing path namespace moduleName helperName = do
     exists <- doesFileExist path
-    case exists of
-        False -> writeHelperPhp path namespace moduleName helperName
-        True -> return ()
+    when (not exists) $
+        writeHelperPhp path namespace moduleName helperName
 
 writeHelperPhp :: FilePath -> String -> String -> String -> IO ()
 writeHelperPhp path namespace moduleName helperName = do

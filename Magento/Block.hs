@@ -2,6 +2,7 @@ module Magento.Block (
     addBlock
 ) where
 
+import Control.Monad (when)
 import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Block (blockXml, blockPhp)
@@ -44,9 +45,7 @@ createBlockPhpIfMissing configXmlPath namespace moduleName blockName =
 writeBlockPhpIfMissing :: FilePath -> String -> String -> String -> IO ()
 writeBlockPhpIfMissing path namespace moduleName blockName = do
     exists <- doesFileExist path
-    case exists of
-        False -> writeBlockPhp path namespace moduleName blockName
-        True -> return ()
+    when (not exists) $ writeBlockPhp path namespace moduleName blockName
 
 writeBlockPhp :: FilePath -> String -> String -> String -> IO ()
 writeBlockPhp path namespace moduleName blockName = do

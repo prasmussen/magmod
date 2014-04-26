@@ -2,6 +2,7 @@ module Magento.Model (
     addModel
 ) where
 
+import Control.Monad (when)
 import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Model (modelXml, modelPhp)
@@ -44,9 +45,8 @@ createModelPhpIfMissing configXmlPath namespace moduleName modelName =
 writeModelPhpIfMissing :: FilePath -> String -> String -> String -> IO ()
 writeModelPhpIfMissing path namespace moduleName modelName = do
     exists <- doesFileExist path
-    case exists of
-        False -> writeModelPhp path namespace moduleName modelName
-        True -> return ()
+    when (not exists) $
+        writeModelPhp path namespace moduleName modelName
 
 writeModelPhp :: FilePath -> String -> String -> String -> IO ()
 writeModelPhp path namespace moduleName modelName = do

@@ -2,6 +2,7 @@ module Magento.Controller (
     addController
 ) where
 
+import Control.Monad (when)
 import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Controller (controllerXml, controllerPhp)
@@ -59,9 +60,8 @@ createControllerPhpIfMissing configXmlPath namespace moduleName scope controller
 writeControllerPhpIfMissing :: FilePath -> String -> String -> String -> String -> IO ()
 writeControllerPhpIfMissing path namespace moduleName scope controllerName = do
     exists <- doesFileExist path
-    case exists of
-        False -> writeControllerPhp path namespace moduleName scope controllerName
-        True -> return ()
+    when (not exists) $
+        writeControllerPhp path namespace moduleName scope controllerName
 
 writeControllerPhp :: FilePath -> String -> String -> String -> String -> IO ()
 writeControllerPhp path namespace moduleName scope controllerName = do
