@@ -12,7 +12,7 @@ cabal-version:       >=1.8
 
 executable magmod
   main-is:             magmod.hs
-  ghc-options:         -fforce-recomp
+  ghc-options:         -fforce-recomp -static -optc-static -optl-static -optl-pthread
   build-depends:       base ==4.6.*,
                        time ==1.4.*,
                        directory ==1.2.*,
