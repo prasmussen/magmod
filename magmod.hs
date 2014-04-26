@@ -36,8 +36,9 @@ dispatch args = case args of
         addObserverHandler "admin" eventName
     ["add", "observer", "global", eventName] ->
         addObserverHandler "global" eventName
-    ["help"] ->
-        helpHandler
+    ["help"] -> helpHandler
+    ["-h"] -> helpHandler
+    ["--help"] -> helpHandler
     _ -> do
         putStrLn "Invalid arguments, use 'help' to see available commands"
         exitFailure
