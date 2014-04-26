@@ -9,9 +9,17 @@ module Util (
     renameWithBackup
 ) where
 
+import Control.Monad (when)
+import System.IO.Error (isDoesNotExistError, catchIOError)
+import Data.Time.Clock (getCurrentTime, diffUTCTime, NominalDiffTime)
+import Control.Applicative ((<$>), (<*>))
 import Data.String.Utils (join, split)
 import Data.Char (toUpper, toLower)
-import System.Directory (renameFile, copyFile)
+import System.Directory (
+    renameFile,
+    copyFile,
+    getModificationTime,
+    doesFileExist)
 import System.FilePath.Posix (
     joinPath,
     splitPath,
@@ -45,8 +53,19 @@ ensureSinglePath paths =
 
 renameWithBackup :: FilePath -> FilePath -> IO ()
 renameWithBackup old new = do
-    copyFile new (backupFname new)
+    -- Do not create backup of destination file
+    -- if it has been modified withing the last 3 seconds
+    recentlyModified <- fileRecentlyModified new 3
+    when (not recentlyModified) $ copyFile new (backupFname new)
     renameFile old new
+
+fileRecentlyModified :: FilePath -> NominalDiffTime -> IO Bool
+fileRecentlyModified p s =
+    (fmap (< s) $ diffUTCTime <$> getCurrentTime <*> getModificationTime p)
+    `catchIOError` \e ->
+        if isDoesNotExistError e
+            then return False
+            else ioError e
 
 tmpFname :: FilePath -> FilePath
 tmpFname path =
