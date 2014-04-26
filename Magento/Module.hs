@@ -1,6 +1,7 @@
 module Magento.Module (
     newModule,
     findConfigXml,
+    basePath,
     codeRootPath
 ) where
 
@@ -30,6 +31,10 @@ findConfigXml =
 codeRootPath :: FilePath -> FilePath
 codeRootPath configXmlPath =
     joinPath [takeDirectory configXmlPath, ".."]
+
+basePath :: FilePath -> FilePath
+basePath configXmlPath =
+    joinPath $ (takeDirectory configXmlPath):(replicate 6 "..")
 
 moduleXmlFname :: String -> String -> String
 moduleXmlFname namespace name =

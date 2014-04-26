@@ -1,0 +1,7 @@
+<layout>
+  <updates>
+    <{{moduleName}}>
+      <file>{{moduleName}}.xml</file>
+    </{{moduleName}}>
+  </updates>
+</layout>

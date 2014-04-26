@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<layout>
+  <!--
+  <default>
+    <reference name="head">
+      <action method="addJs"><script>custom.js</script></action>
+      <action method="addCss"><script>css/custom.css</script></action>
+    </reference>
+  </default>
+  -->
+</layout>
