@@ -24,7 +24,8 @@ import System.FilePath.Posix (
     joinPath,
     splitPath,
     takeDirectory,
-    takeBaseName)
+    takeBaseName,
+    takeExtension)
 
 
 lowercase :: String -> String
@@ -71,12 +72,12 @@ tmpFname :: FilePath -> FilePath
 tmpFname path =
     joinPath [
         takeDirectory path,
-        "." ++ takeBaseName path ++ ".new"
+        join "" [".", takeBaseName path, "_tmp", takeExtension path]
     ]
 
 backupFname :: FilePath -> FilePath
 backupFname path =
     joinPath [
         takeDirectory path,
-        "." ++ takeBaseName path ++ ".old"
+        join "" [".", takeBaseName path, "_bk", takeExtension path]
     ]
