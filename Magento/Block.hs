@@ -8,6 +8,7 @@ import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Block (blockXml, blockPhp)
 import Magento.Module (codeRootPath)
 import Util (
+    writeFileAndPrint,
     capitalize,
     capitalizePath,
     lowercase)
@@ -50,7 +51,7 @@ writeBlockPhpIfMissing path namespace moduleName blockName = do
 writeBlockPhp :: FilePath -> String -> String -> String -> IO ()
 writeBlockPhp path namespace moduleName blockName = do
     php <- blockPhp $ className namespace moduleName blockName
-    writeFile path php
+    writeFileAndPrint path php
 
 classNamePrefix :: String -> String -> String
 classNamePrefix namespace moduleName =

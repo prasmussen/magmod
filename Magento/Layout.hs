@@ -7,7 +7,7 @@ import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Layout (layoutXml, layoutConfigXml)
 import Magento.Module (basePath)
-import Util (lowercase)
+import Util (lowercase, writeFileAndPrint)
 import Util.XML (insertXmlIfMissing)
 
 
@@ -36,7 +36,7 @@ writeLayoutXmlIfMissing path = do
 writeLayoutXml :: FilePath -> IO ()
 writeLayoutXml path = do
     xml <- layoutXml
-    writeFile path xml
+    writeFileAndPrint path xml
 
 xpath :: String -> String
 xpath "admin" = "/config/adminhtml/layout"

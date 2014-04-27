@@ -4,6 +4,7 @@ module Util.XML (
     insertXmlIfMissing
 ) where
 
+import Control.Monad (when)
 import Control.Category ((>>>))
 import Text.XML.HXT.DOM.TypeDefs (XmlTree)
 import Text.XML.HXT.Arrow.ReadDocument (readDocument, xread)
@@ -15,7 +16,7 @@ import Text.XML.HXT.XPath.Arrows (getXPathTrees, processXPathTrees)
 import Control.Arrow.ArrowList (constA, this)
 import Control.Arrow.ArrowTree (insertChildrenAt)
 import Data.String.Utils (join, split)
-import Util (renameWithBackup, tmpFname)
+import Util (renameWithBackupAndPrint, tmpFname)
 
 toXmlTree :: (ArrowXml a) => String -> a b XmlTree
 toXmlTree str = constA str >>> xread
@@ -40,11 +41,7 @@ insertXmlIfMissing fpath xpath xml = do
         (xmlElement $ xPathCurrent $ xPathParent xpath)
     -- Check if xpath exists in xml file
     exists <- xPathExists fpath xpath
-    case exists of
-        True ->
-            return ()
-        False -> do
-            insertXml fpath (xPathParent xpath) xml
+    when (not exists) $ insertXml fpath (xPathParent xpath) xml
 
 insertXml :: FilePath -> String -> String -> IO ()
 insertXml fpath xpath xml = do
@@ -55,7 +52,7 @@ insertXml fpath xpath xml = do
             (this >>> insertChildrenAt 0 (toXmlTree xml)) xpath >>>
         indentDoc >>>
         writeDocument [] path
-    renameWithBackup path fpath
+    renameWithBackupAndPrint path fpath
     return ()
 
 xmlElement :: String -> String

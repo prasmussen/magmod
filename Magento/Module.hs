@@ -11,7 +11,7 @@ import Data.Functor ((<$>))
 import System.FilePath.Find (find, always, fileName, (==?))
 import Template.Module (moduleXml)
 import Template.Config (configXml)
-import Util (capitalize, lowercase, ensureSinglePath)
+import Util (capitalize, lowercase, ensureSinglePath, writeFileAndPrint)
 
 
 newModule :: String -> String -> String -> IO ()
@@ -74,14 +74,14 @@ writeModuleXml path codepool namespace name = do
         (lowercase codepool)
         (lowercase namespace)
         (lowercase name)
-    writeFile path xml
+    writeFileAndPrint path xml
 
 writeConfigXml :: String -> String -> String -> IO ()
 writeConfigXml path namespace name = do
     xml <- configXml
         (lowercase namespace)
         (lowercase name)
-    writeFile path xml
+    writeFileAndPrint path xml
 
 createModuleXml :: String -> String -> String -> IO ()
 createModuleXml codepool namespace name =

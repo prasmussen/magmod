@@ -8,6 +8,7 @@ import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Helper (helperXml, helperPhp)
 import Magento.Module (codeRootPath)
 import Util (
+    writeFileAndPrint,
     capitalize,
     capitalizePath,
     lowercase)
@@ -51,7 +52,7 @@ writeHelperPhpIfMissing path namespace moduleName helperName = do
 writeHelperPhp :: FilePath -> String -> String -> String -> IO ()
 writeHelperPhp path namespace moduleName helperName = do
     php <- helperPhp $ className namespace moduleName helperName
-    writeFile path php
+    writeFileAndPrint path php
 
 classNamePrefix :: String -> String -> String
 classNamePrefix namespace moduleName =

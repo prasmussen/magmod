@@ -8,6 +8,7 @@ import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Model (modelXml, modelPhp)
 import Magento.Module (codeRootPath)
 import Util (
+    writeFileAndPrint,
     capitalize,
     capitalizePath,
     lowercase)
@@ -51,7 +52,7 @@ writeModelPhpIfMissing path namespace moduleName modelName = do
 writeModelPhp :: FilePath -> String -> String -> String -> IO ()
 writeModelPhp path namespace moduleName modelName = do
     php <- modelPhp $ className namespace moduleName modelName
-    writeFile path php
+    writeFileAndPrint path php
 
 classNamePrefix :: String -> String -> String
 classNamePrefix namespace moduleName =

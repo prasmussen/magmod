@@ -8,6 +8,7 @@ import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Controller (controllerXml, controllerPhp)
 import Magento.Module (codeRootPath)
 import Util (
+    writeFileAndPrint,
     capitalize,
     capitalizePath,
     lowercase)
@@ -68,7 +69,7 @@ writeControllerPhp path namespace moduleName scope controllerName = do
     php <- controllerPhp
         (className namespace moduleName controllerName)
         (parentClassName scope)
-    writeFile path php
+    writeFileAndPrint path php
 
 classNamePrefix :: String -> String -> String
 classNamePrefix namespace moduleName =

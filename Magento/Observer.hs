@@ -47,6 +47,6 @@ createObserverPhpIfMissing configXmlPath namespace moduleName eventName = do
         (composeMethodName eventName)
 
 insertObserverPhp :: FilePath -> String -> IO ()
-insertObserverPhp modelPath methodName = do
+insertObserverPhp path methodName = do
     php <- observerPhp methodName
-    insertPhpMethod modelPath php
+    insertPhpMethod path php

@@ -5,7 +5,7 @@ module Util.PHP (
 import Control.Monad.State (when)
 import Data.List (isInfixOf, isPrefixOf)
 import System.IO (hPutStrLn, hClose, openTempFile, Handle)
-import Util (renameWithBackup)
+import Util (renameWithBackupAndPrint)
 
 type Parser = [(String -> Bool)]
 
@@ -16,7 +16,7 @@ insertPhpMethod path payload = do
     contents <- readFile path
     (tmp, handle) <- openTempFile "." ".tmp"
     insert handle (lines contents) phpClassBodyStartParser payload
-    renameWithBackup tmp path
+    renameWithBackupAndPrint tmp path
 
 insert :: Handle -> [String] -> Parser -> String -> IO ()
 insert dst [] _ _ = hClose dst
