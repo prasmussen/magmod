@@ -20,11 +20,11 @@ insertPhpMethod path payload = do
 
 insert :: Handle -> [String] -> Parser -> String -> IO ()
 insert dst [] _ _ = hClose dst
-insert dst (line:lines) parser payload = do
+insert dst (line:xs) parser payload = do
     hPutStrLn dst line
     let (status, newParser) = parse parser line in do
         when (status == Found) $ hPutStrLn dst payload
-        insert dst lines newParser payload
+        insert dst xs newParser payload
 
 phpClassBodyStartParser :: Parser
 phpClassBodyStartParser = [findClass, findLeftCurlyBracket]
@@ -36,7 +36,7 @@ findClass :: String -> Bool
 findClass str = isPrefixOf "class" str
 
 parse :: Parser -> String -> (Status, Parser)
-parse [] str = (Done, [])
+parse [] _ = (Done, [])
 parse [f] str = case f str of
     True -> (Found, [])
     False -> (NotFound, [f])

@@ -46,7 +46,7 @@ insertXmlIfMissing fpath xpath xml = do
 insertXml :: FilePath -> String -> String -> IO ()
 insertXml fpath xpath xml = do
     let path = tmpFname fpath
-    runX $
+    _ <- runX $
         readDocument [] fpath >>>
         processXPathTrees
             (this >>> insertChildrenAt 0 (toXmlTree xml)) xpath >>>

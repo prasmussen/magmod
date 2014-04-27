@@ -21,8 +21,7 @@ import System.Directory (
     canonicalizePath,
     renameFile,
     copyFile,
-    getModificationTime,
-    doesFileExist)
+    getModificationTime)
 import System.FilePath.Posix (
     joinPath,
     splitPath,
