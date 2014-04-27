@@ -6,7 +6,7 @@ import Control.Monad (when)
 import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Controller (controllerXml, controllerPhp)
-import Magento.Module (codeRootPath)
+import Magento.Module (codeRootPath, fullModuleName)
 import Util (
     writeFileAndPrint,
     capitalize,
@@ -38,9 +38,6 @@ xpath "frontend" = "/config/frontend/routers"
 router :: String -> String
 router "admin" = "admin"
 router "frontend" = "standard"
-
-fullModuleName :: String -> String -> String
-fullModuleName namespace moduleName = join "_" [namespace, moduleName]
 
 composeControllerPhpPath :: FilePath -> String -> String
 composeControllerPhpPath configXmlPath controllerName =

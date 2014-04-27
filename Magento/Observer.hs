@@ -6,7 +6,7 @@ import System.FilePath.Posix (joinPath)
 import Template.Observer (observerXml, observerPhp)
 import Magento.Model (addModel)
 import Magento.Module (codeRootPath)
-import Util (camelcase)
+import Util (camelcase, lowercase)
 import Util.XML (insertXmlIfMissing)
 import Util.PHP (insertPhpMethod)
 import Data.String.Utils (join)
@@ -18,9 +18,13 @@ addObserver configXmlPath namespace moduleName scope eventName = do
 
 insertObserverXmlIfMissing :: FilePath -> String -> String -> String -> IO ()
 insertObserverXmlIfMissing configXmlPath moduleName scope eventName = do
-    let xpath = join "" ["/config/", scopeName scope, "/events/", eventName]
-    xml <- (observerXml moduleName eventName (composeMethodName eventName))
-    insertXmlIfMissing configXmlPath xpath xml
+    xml <- observerXml
+        (lowercase moduleName) eventName (composeMethodName eventName)
+    insertXmlIfMissing configXmlPath (xpath scope eventName) xml
+
+xpath :: String -> String -> String
+xpath scope eventName =
+    join "" ["/config/", scopeName scope, "/events/", eventName]
 
 composeMethodName :: String -> String
 composeMethodName eventName = camelcase eventName

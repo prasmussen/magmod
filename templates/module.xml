@@ -2,9 +2,9 @@
 
 <config>
   <modules>
-    <{{namespace}}_{{name}}>
+    <{{fullModuleName}}>
       <active>true</active>
       <codePool>{{codepool}}</codePool>
-    </{{namespace}}_{{name}}>
+    </{{fullModuleName}}>
   </modules>
 </config>

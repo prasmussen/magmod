@@ -1,6 +1,7 @@
 module Magento.Module (
     newModule,
     findConfigXml,
+    fullModuleName,
     basePath,
     codeRootPath
 ) where
@@ -9,9 +10,9 @@ import System.Directory (createDirectoryIfMissing, doesDirectoryExist)
 import System.FilePath.Posix (joinPath, takeDirectory)
 import Data.Functor ((<$>))
 import System.FilePath.Find (find, always, fileName, (==?))
-import Template.Module (moduleXml)
-import Template.Config (configXml)
+import Template.Module (moduleXml, configXml)
 import Util (capitalize, lowercase, ensureSinglePath, writeFileAndPrint)
+import Data.String.Utils (join)
 
 
 newModule :: String -> String -> String -> IO ()
@@ -70,17 +71,12 @@ composeConfigXmlPath codepool namespace name =
 
 writeModuleXml :: String -> String -> String -> String -> IO ()
 writeModuleXml path codepool namespace name = do
-    xml <- moduleXml
-        (lowercase codepool)
-        (lowercase namespace)
-        (lowercase name)
+    xml <- moduleXml (lowercase codepool) (fullModuleName namespace name)
     writeFileAndPrint path xml
 
 writeConfigXml :: String -> String -> String -> IO ()
 writeConfigXml path namespace name = do
-    xml <- configXml
-        (lowercase namespace)
-        (lowercase name)
+    xml <- configXml (fullModuleName namespace name)
     writeFileAndPrint path xml
 
 createModuleXml :: String -> String -> String -> IO ()
@@ -96,3 +92,7 @@ createConfigXml codepool namespace name =
     in do
         createDirectoryIfMissing True (takeDirectory configXmlPath)
         writeConfigXml configXmlPath namespace name
+
+fullModuleName :: String -> String -> String
+fullModuleName namespace moduleName =
+    join "_" [capitalize namespace, capitalize moduleName]
