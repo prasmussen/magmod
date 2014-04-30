@@ -1,5 +1,6 @@
 module Magento.Model (
-    addModel
+    addModel,
+    modelPath
 ) where
 
 import Control.Monad (when)
@@ -28,8 +29,8 @@ insertModelXmlIfMissing configXmlPath namespace moduleName = do
         (classNamePrefix namespace moduleName)
     insertXmlIfMissing configXmlPath "/config/global/models" xml
 
-composeModelPhpPath :: FilePath -> String -> String
-composeModelPhpPath configXmlPath modelName =
+modelPath :: FilePath -> String -> String
+modelPath configXmlPath modelName =
     joinPath [
         codeRootPath configXmlPath,
         "Model",
@@ -38,7 +39,7 @@ composeModelPhpPath configXmlPath modelName =
 
 createModelPhpIfMissing :: FilePath -> String -> String -> String -> IO ()
 createModelPhpIfMissing configXmlPath namespace moduleName modelName =
-    let modelPhpPath = composeModelPhpPath configXmlPath modelName
+    let modelPhpPath = modelPath configXmlPath modelName
     in do
         createDirectoryIfMissing True (takeDirectory modelPhpPath)
         writeModelPhpIfMissing modelPhpPath namespace moduleName modelName

@@ -6,6 +6,7 @@ import Magento.Model (addModel)
 import Magento.Block (addBlock)
 import Magento.Controller (addController)
 import Magento.Observer (addObserver)
+import Magento.Resource (addResource)
 import Magento.Layout (addLayout)
 import System.Exit (exitFailure)
 
@@ -37,6 +38,8 @@ dispatch args = case args of
         addObserverHandler "admin" eventName
     ["add", "observer", "global", eventName] ->
         addObserverHandler "global" eventName
+    ["add", "resource", name] ->
+        addResourceHandler name
     ["add", "layout", "frontend"] ->
         addLayoutHandler "frontend"
     ["add", "layout", "admin"] ->
@@ -56,8 +59,9 @@ helpHandler = do
         "add helper <name>",
         "add model <name>",
         "add block <name>",
-        "add controller <scope> <controller_name>",
-        "add observer <scope> <event_name>",
+        "add controller <scope> <name>",
+        "add resource <name>",
+        "add observer <scope> <event>",
         "add layout <scope>"]
 
 newModuleHandler :: String -> String -> String -> IO ()
@@ -88,6 +92,11 @@ addObserverHandler :: String -> String -> IO ()
 addObserverHandler scope eventName =
     isInsideModule (\configXmlPath namespace moduleName ->
         addObserver configXmlPath namespace moduleName scope eventName)
+
+addResourceHandler :: String -> IO ()
+addResourceHandler entityName =
+    isInsideModule (\configXmlPath namespace moduleName ->
+        addResource configXmlPath namespace moduleName entityName)
 
 addLayoutHandler :: String -> IO ()
 addLayoutHandler scope =
