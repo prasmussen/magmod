@@ -23,10 +23,10 @@ insertLayoutConfigXmlIfMissing configXmlPath moduleName scope = do
 
 createLayoutXmlIfMissing :: FilePath -> String -> String -> IO ()
 createLayoutXmlIfMissing configXmlPath moduleName scope =
-    let layoutXmlPath = composeLayoutXmlPath configXmlPath moduleName scope
+    let path = layoutPath configXmlPath moduleName scope
     in do
-        createDirectoryIfMissing True (takeDirectory layoutXmlPath)
-        writeLayoutXmlIfMissing layoutXmlPath
+        createDirectoryIfMissing True (takeDirectory path)
+        writeLayoutXmlIfMissing path
 
 writeLayoutXmlIfMissing :: FilePath -> IO ()
 writeLayoutXmlIfMissing path = do
@@ -46,8 +46,8 @@ scopeName :: String -> String
 scopeName "frontend" = "frontend"
 scopeName "admin" = "adminhtml"
 
-composeLayoutXmlPath :: FilePath -> String -> String -> FilePath
-composeLayoutXmlPath configXmlPath moduleName scope =
+layoutPath :: FilePath -> String -> String -> FilePath
+layoutPath configXmlPath moduleName scope =
     joinPath [
         basePath configXmlPath,
         "app",

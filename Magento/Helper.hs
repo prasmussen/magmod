@@ -28,8 +28,8 @@ insertHelperXmlIfMissing configXmlPath namespace moduleName = do
         (classNamePrefix namespace moduleName)
     insertXmlIfMissing configXmlPath "/config/global/helpers" xml
 
-composeHelperPhpPath :: FilePath -> String -> String
-composeHelperPhpPath configXmlPath helperName =
+helperPath :: FilePath -> String -> String
+helperPath configXmlPath helperName =
     joinPath [
         codeRootPath configXmlPath,
         "Helper",
@@ -38,10 +38,10 @@ composeHelperPhpPath configXmlPath helperName =
 
 createHelperPhpIfMissing :: FilePath -> String -> String -> String -> IO ()
 createHelperPhpIfMissing configXmlPath namespace moduleName helperName =
-    let helperPhpPath = composeHelperPhpPath configXmlPath helperName
+    let path = helperPath configXmlPath helperName
     in do
-        createDirectoryIfMissing True (takeDirectory helperPhpPath)
-        writeHelperPhpIfMissing helperPhpPath namespace moduleName helperName
+        createDirectoryIfMissing True (takeDirectory path)
+        writeHelperPhpIfMissing path namespace moduleName helperName
 
 writeHelperPhpIfMissing :: FilePath -> String -> String -> String -> IO ()
 writeHelperPhpIfMissing path namespace moduleName helperName = do

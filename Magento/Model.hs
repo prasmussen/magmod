@@ -39,10 +39,10 @@ modelPath configXmlPath modelName =
 
 createModelPhpIfMissing :: FilePath -> String -> String -> String -> IO ()
 createModelPhpIfMissing configXmlPath namespace moduleName modelName =
-    let modelPhpPath = modelPath configXmlPath modelName
+    let path = modelPath configXmlPath modelName
     in do
-        createDirectoryIfMissing True (takeDirectory modelPhpPath)
-        writeModelPhpIfMissing modelPhpPath namespace moduleName modelName
+        createDirectoryIfMissing True (takeDirectory path)
+        writeModelPhpIfMissing path namespace moduleName modelName
 
 writeModelPhpIfMissing :: FilePath -> String -> String -> String -> IO ()
 writeModelPhpIfMissing path namespace moduleName modelName = do

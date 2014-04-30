@@ -39,8 +39,8 @@ router :: String -> String
 router "admin" = "admin"
 router "frontend" = "standard"
 
-composeControllerPhpPath :: FilePath -> String -> String
-composeControllerPhpPath configXmlPath controllerName =
+controllerPath :: FilePath -> String -> String
+controllerPath configXmlPath controllerName =
     joinPath [
         codeRootPath configXmlPath,
         "controllers",
@@ -49,11 +49,11 @@ composeControllerPhpPath configXmlPath controllerName =
 
 createControllerPhpIfMissing :: FilePath -> String -> String -> String -> String -> IO ()
 createControllerPhpIfMissing configXmlPath namespace moduleName scope controllerName =
-    let controllerPhpPath = composeControllerPhpPath configXmlPath controllerName
+    let path = controllerPath configXmlPath controllerName
     in do
-        createDirectoryIfMissing True (takeDirectory controllerPhpPath)
+        createDirectoryIfMissing True (takeDirectory path)
         writeControllerPhpIfMissing
-            controllerPhpPath namespace moduleName scope controllerName
+            path namespace moduleName scope controllerName
 
 writeControllerPhpIfMissing :: FilePath -> String -> String -> String -> String -> IO ()
 writeControllerPhpIfMissing path namespace moduleName scope controllerName = do

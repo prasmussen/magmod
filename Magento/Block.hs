@@ -28,8 +28,8 @@ insertBlockXmlIfMissing configXmlPath namespace moduleName = do
         (classNamePrefix namespace moduleName)
     insertXmlIfMissing configXmlPath "/config/global/blocks" xml
 
-composeBlockPhpPath :: FilePath -> String -> String
-composeBlockPhpPath configXmlPath blockName =
+blockPath :: FilePath -> String -> String
+blockPath configXmlPath blockName =
     joinPath [
         codeRootPath configXmlPath,
         "Block",
@@ -38,10 +38,10 @@ composeBlockPhpPath configXmlPath blockName =
 
 createBlockPhpIfMissing :: FilePath -> String -> String -> String -> IO ()
 createBlockPhpIfMissing configXmlPath namespace moduleName blockName =
-    let blockPhpPath = composeBlockPhpPath configXmlPath blockName
+    let path = blockPath configXmlPath blockName
     in do
-        createDirectoryIfMissing True (takeDirectory blockPhpPath)
-        writeBlockPhpIfMissing blockPhpPath namespace moduleName blockName
+        createDirectoryIfMissing True (takeDirectory path)
+        writeBlockPhpIfMissing path namespace moduleName blockName
 
 writeBlockPhpIfMissing :: FilePath -> String -> String -> String -> IO ()
 writeBlockPhpIfMissing path namespace moduleName blockName = do

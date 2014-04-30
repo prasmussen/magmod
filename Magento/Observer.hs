@@ -34,8 +34,8 @@ scopeName "frontend" = "frontend"
 scopeName "admin" = "adminhtml"
 scopeName "global" = "global"
 
-composeObserverPhpPath :: FilePath -> String
-composeObserverPhpPath configXmlPath =
+observerPath :: FilePath -> String
+observerPath configXmlPath =
     joinPath [
         codeRootPath configXmlPath,
         "Model",
@@ -47,7 +47,7 @@ createObserverPhpIfMissing configXmlPath namespace moduleName eventName = do
     -- Add observer model
     addModel configXmlPath namespace moduleName "Observer"
     insertObserverPhp
-        (composeObserverPhpPath configXmlPath)
+        (observerPath configXmlPath)
         (composeMethodName eventName)
 
 insertObserverPhp :: FilePath -> String -> IO ()
