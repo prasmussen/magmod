@@ -44,7 +44,7 @@ composeControllerPhpPath configXmlPath controllerName =
     joinPath [
         codeRootPath configXmlPath,
         "controllers",
-        (capitalizePath controllerName) ++ ".php"
+        (capitalizePath controllerName) ++ "Controller.php"
     ]
 
 createControllerPhpIfMissing :: FilePath -> String -> String -> String -> String -> IO ()
