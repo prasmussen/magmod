@@ -12,6 +12,7 @@ import Text.XML.HXT.Arrow.XmlState.RunIOStateArrow (runX)
 import Text.XML.HXT.Arrow.XmlArrow (getElemName, ArrowXml)
 import Text.XML.HXT.Arrow.Edit (indentDoc)
 import Text.XML.HXT.Arrow.WriteDocument (writeDocument)
+import Text.XML.HXT.Arrow.XmlState.SystemConfig (withPreserveComment)
 import Text.XML.HXT.XPath.Arrows (getXPathTrees, processXPathTrees)
 import Control.Arrow.ArrowList (constA, this)
 import Control.Arrow.ArrowTree (insertChildrenAt)
@@ -47,7 +48,7 @@ insertXml :: FilePath -> String -> String -> IO ()
 insertXml fpath xpath xml = do
     let path = tmpFname fpath
     _ <- runX $
-        readDocument [] fpath >>>
+        readDocument [withPreserveComment True] fpath >>>
         processXPathTrees
             (this >>> insertChildrenAt 0 (toXmlTree xml)) xpath >>>
         indentDoc >>>
