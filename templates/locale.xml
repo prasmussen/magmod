@@ -1,0 +1,9 @@
+<translate>
+  <modules>
+    <{{fullModuleName}}>
+      <files>
+        <default>{{filename}}</default>
+      </files>
+    </{{fullModuleName}}>
+  </modules>
+</translate>

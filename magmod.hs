@@ -8,6 +8,7 @@ import Magento.Controller (addController)
 import Magento.Observer (addObserver)
 import Magento.Resource (addResource)
 import Magento.Layout (addLayout)
+import Magento.Locale (addLocale)
 import System.Exit (exitFailure)
 
 
@@ -44,6 +45,10 @@ dispatch args = case args of
         addLayoutHandler "frontend"
     ["add", "layout", "admin"] ->
         addLayoutHandler "admin"
+    ["add", "locale", "frontend", name] ->
+        addLocaleHandler "frontend" name
+    ["add", "locale", "admin", name] ->
+        addLocaleHandler "admin" name
     ["help"] -> helpHandler
     ["-h"] -> helpHandler
     ["--help"] -> helpHandler
@@ -62,7 +67,8 @@ helpHandler = do
         "add controller <scope> <name>",
         "add resource <name>",
         "add observer <scope> <event>",
-        "add layout <scope>"]
+        "add layout <scope>",
+        "add locale <scope> <locale>"]
 
 newModuleHandler :: String -> String -> String -> IO ()
 newModuleHandler codepool namespace name =
@@ -102,6 +108,11 @@ addLayoutHandler :: String -> IO ()
 addLayoutHandler scope =
     isInsideModule (\configXmlPath _ moduleName ->
         addLayout configXmlPath moduleName scope)
+
+addLocaleHandler :: String -> String -> IO ()
+addLocaleHandler scope localeName =
+    isInsideModule (\configXmlPath namespace moduleName ->
+        addLocale configXmlPath namespace moduleName scope localeName)
 
 isInsideModule :: (FilePath -> String -> String -> IO ()) -> IO ()
 isInsideModule f = do
