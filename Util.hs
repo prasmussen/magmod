@@ -19,6 +19,7 @@ import Data.Char (toUpper, toLower)
 import System.Directory (
     makeRelativeToCurrentDirectory,
     canonicalizePath,
+    copyPermissions,
     renameFile,
     copyFile,
     getModificationTime)
@@ -70,10 +71,11 @@ ensureSinglePath paths =
 renameWithBackupAndPrint :: FilePath -> FilePath -> IO ()
 renameWithBackupAndPrint old new = do
     -- Do not create backup of destination file
-    -- if it has been modified withing the last 3 seconds
+    -- if it has been modified within the last 3 seconds
     recentlyModified <- fileRecentlyModified new 3
     M.when (not recentlyModified) $ copyFile new (backupFname new)
     renameFile old new
+    copyPermissions (backupFname new) new
     prettyPath new (\x -> putStrLn $ "-- Updated " ++ x)
 
 fileRecentlyModified :: FilePath -> NominalDiffTime -> IO Bool
