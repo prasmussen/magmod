@@ -60,15 +60,21 @@ helpHandler :: IO ()
 helpHandler = do
     name <- getProgName
     mapM_ (putStrLn . (name ++) . (" " ++)) [
-        "new <codepool> <namespace> <name>",
+        "new local <namespace> <name>",
+        "new community <namespace> <name>",
         "add helper <name>",
         "add model <name>",
         "add block <name>",
-        "add controller <scope> <name>",
+        "add controller frontend <name>",
+        "add controller admin <name>",
         "add resource <name>",
-        "add observer <scope> <event>",
-        "add layout <scope>",
-        "add locale <scope> <locale>"]
+        "add observer frontend <event>",
+        "add observer admin <event>",
+        "add observer global <event>",
+        "add layout frontend",
+        "add layout admin",
+        "add locale frontend <locale>",
+        "add locale admin <locale>"]
 
 newModuleHandler :: String -> String -> String -> IO ()
 newModuleHandler codepool namespace name =
