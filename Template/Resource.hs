@@ -25,26 +25,30 @@ data ResourceTemplate = ResourceTemplate {
 
 resourceXml :: String -> String -> IO String
 resourceXml classPrefix resourceName =
-    render "resource.xml" (ConfigXmlTemplate classPrefix resourceName)
+    render
+        "resource/resource.xml"
+        (ConfigXmlTemplate classPrefix resourceName)
 
 entityXml :: String -> String -> IO String
 entityXml entityName tableName =
-    render "resource_entity.xml" (ResourceTemplate "" "" entityName tableName)
+    render
+        "resource/entity.xml"
+        (ResourceTemplate "" "" entityName tableName)
 
 modelConstructor :: String -> String -> IO String
 modelConstructor moduleName entityName =
     render
-        "resource_constructor.php"
+        "resource/model_constructor.php"
         (ResourceTemplate moduleName "" entityName "")
 
 resourcePhp :: String -> String -> String -> IO String
 resourcePhp moduleName className entityName =
     render
-        "resource.php"
+        "resource/resource.php"
         (ResourceTemplate moduleName className entityName "")
 
 collectionPhp :: String -> String -> String -> IO String
 collectionPhp moduleName className entityName =
     render
-        "resource_collection.php"
+        "resource/collection.php"
         (ResourceTemplate moduleName className entityName "")

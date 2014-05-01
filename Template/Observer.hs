@@ -16,8 +16,12 @@ data ObserverTemplate = ObserverTemplate {
 
 observerXml :: String -> String -> String -> IO String
 observerXml moduleName eventName methodName =
-    render "observer.xml" (ObserverTemplate moduleName eventName methodName)
+    render
+        "observer/observer.xml"
+        (ObserverTemplate moduleName eventName methodName)
 
 observerPhp :: String -> IO String
 observerPhp methodName =
-    render "observer.php" (ObserverTemplate "" "" methodName)
+    render
+        "observer/observer.php"
+        (ObserverTemplate "" "" methodName)

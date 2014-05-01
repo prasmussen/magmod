@@ -21,8 +21,12 @@ data CtrlPhpTemplate = CtrlPhpTemplate {
 
 controllerXml :: String -> String -> String -> IO String
 controllerXml moduleName fullModuleName router =
-    render "controller.xml" (CtrlXmlTemplate moduleName fullModuleName router)
+    render
+        "controller/controller.xml"
+        (CtrlXmlTemplate moduleName fullModuleName router)
 
 controllerPhp :: String -> String -> IO String
 controllerPhp className parentClassName =
-    render "controller.php" (CtrlPhpTemplate className parentClassName)
+    render
+        "controller/controller.php"
+        (CtrlPhpTemplate className parentClassName)

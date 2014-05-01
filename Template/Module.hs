@@ -15,8 +15,8 @@ data ModuleTemplate = ModuleTemplate {
 
 moduleXml :: String -> String -> IO String
 moduleXml codepool fullModuleName =
-    render "module.xml" (ModuleTemplate codepool fullModuleName)
+    render "module/module.xml" (ModuleTemplate codepool fullModuleName)
 
 configXml :: String -> IO String
 configXml fullModuleName =
-    render "config.xml" (ModuleTemplate "" fullModuleName)
+    render "module/config.xml" (ModuleTemplate "" fullModuleName)

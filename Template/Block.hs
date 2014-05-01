@@ -19,8 +19,8 @@ data BlockPhpTemplate = BlockPhpTemplate {
 
 blockXml :: String -> String -> IO String
 blockXml name classNamePrefix =
-    render "block.xml" (BlockXmlTemplate name classNamePrefix)
+    render "block/block.xml" (BlockXmlTemplate name classNamePrefix)
 
 blockPhp :: String -> IO String
 blockPhp className =
-    render "block.php" (BlockPhpTemplate className)
+    render "block/block.php" (BlockPhpTemplate className)

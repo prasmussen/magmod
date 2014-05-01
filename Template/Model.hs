@@ -19,8 +19,8 @@ data ModelPhpTemplate = ModelPhpTemplate {
 
 modelXml :: String -> String -> IO String
 modelXml name classNamePrefix =
-    render "model.xml" (ModelXmlTemplate name classNamePrefix)
+    render "model/model.xml" (ModelXmlTemplate name classNamePrefix)
 
 modelPhp :: String -> IO String
 modelPhp className =
-    render "model.php" (ModelPhpTemplate className)
+    render "model/model.php" (ModelPhpTemplate className)

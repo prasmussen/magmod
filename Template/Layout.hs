@@ -14,9 +14,9 @@ data LayoutXmlTemplate = LayoutXmlTemplate {
 
 layoutConfigXml :: String -> IO String
 layoutConfigXml moduleName =
-    render "layout_config.xml" (LayoutXmlTemplate moduleName)
+    render "layout/config.xml" (LayoutXmlTemplate moduleName)
 
 layoutXml :: IO String
 layoutXml =
-    render "layout.xml" (LayoutXmlTemplate "")
+    render "layout/layout.xml" (LayoutXmlTemplate "")
 

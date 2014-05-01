@@ -19,8 +19,8 @@ data HelperPhpTemplate = HelperPhpTemplate {
 
 helperXml :: String -> String -> IO String
 helperXml name classNamePrefix =
-    render "helper.xml" (HelperXmlTemplate name classNamePrefix)
+    render "helper/helper.xml" (HelperXmlTemplate name classNamePrefix)
 
 helperPhp :: String -> IO String
 helperPhp className =
-    render "helper.php" (HelperPhpTemplate className)
+    render "helper/helper.php" (HelperPhpTemplate className)

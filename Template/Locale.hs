@@ -14,4 +14,4 @@ data LocaleXmlTemplate = LocaleXmlTemplate {
 
 localeXml :: String -> String -> IO String
 localeXml fullModuleName filename =
-    render "locale.xml" (LocaleXmlTemplate fullModuleName filename)
+    render "locale/locale.xml" (LocaleXmlTemplate fullModuleName filename)
