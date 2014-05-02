@@ -7,68 +7,67 @@ import Control.Monad (when)
 import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Model (modelXml, modelPhp)
-import Magento.Module (codeRootPath)
+import Magento.Module (
+    ModuleInfo,
+    codeRootPath,
+    getName,
+    getNamespace,
+    getConfigXml,
+    getFullName)
 import Util (
     writeFileAndPrint,
     capitalize,
     capitalizePath,
     lowercase)
-import Data.String.Utils (replace)
+import Data.String.Utils (replace, join)
 import Util.XML (insertXmlIfMissing)
 
 
-addModel :: FilePath -> String -> String -> String -> IO ()
-addModel configXmlPath namespace moduleName modelName = do
-    insertModelXmlIfMissing configXmlPath namespace moduleName
-    createModelPhpIfMissing configXmlPath namespace moduleName modelName
+addModel :: ModuleInfo -> String -> IO ()
+addModel info modelName = do
+    insertModelXmlIfMissing info
+    createModelPhpIfMissing info modelName
 
-insertModelXmlIfMissing :: FilePath -> String -> String -> IO ()
-insertModelXmlIfMissing configXmlPath namespace moduleName = do
-    xml <- modelXml
-        (lowercase moduleName)
-        (classNamePrefix namespace moduleName)
-    insertXmlIfMissing configXmlPath "/config/global/models" xml
+insertModelXmlIfMissing :: ModuleInfo -> IO ()
+insertModelXmlIfMissing info = do
+    xml <- modelXml (lowercase $ getName info) (classNamePrefix info)
+    insertXmlIfMissing (getConfigXml info) "/config/global/models" xml
 
-modelPath :: FilePath -> String -> String
-modelPath configXmlPath modelName =
+createModelPhpIfMissing :: ModuleInfo -> String -> IO ()
+createModelPhpIfMissing info modelName =
+    let path = modelPath info modelName in do
+        createDirectoryIfMissing True (takeDirectory path)
+        writeModelPhpIfMissing info path modelName
+
+writeModelPhpIfMissing :: ModuleInfo -> FilePath -> String -> IO ()
+writeModelPhpIfMissing info path modelName = do
+    exists <- doesFileExist path
+    when (not exists) $ writeModelPhp info path modelName
+
+writeModelPhp :: ModuleInfo -> FilePath -> String -> IO ()
+writeModelPhp info path modelName = do
+    php <- modelPhp $ className info modelName
+    writeFileAndPrint path php
+
+modelPath :: ModuleInfo -> String -> String
+modelPath info modelName =
     joinPath [
-        codeRootPath configXmlPath,
+        codeRootPath info,
         "Model",
         (capitalizePath modelName) ++ ".php"
     ]
 
-createModelPhpIfMissing :: FilePath -> String -> String -> String -> IO ()
-createModelPhpIfMissing configXmlPath namespace moduleName modelName =
-    let path = modelPath configXmlPath modelName
-    in do
-        createDirectoryIfMissing True (takeDirectory path)
-        writeModelPhpIfMissing path namespace moduleName modelName
-
-writeModelPhpIfMissing :: FilePath -> String -> String -> String -> IO ()
-writeModelPhpIfMissing path namespace moduleName modelName = do
-    exists <- doesFileExist path
-    when (not exists) $
-        writeModelPhp path namespace moduleName modelName
-
-writeModelPhp :: FilePath -> String -> String -> String -> IO ()
-writeModelPhp path namespace moduleName modelName = do
-    php <- modelPhp $ className namespace moduleName modelName
-    writeFileAndPrint path php
-
-classNamePrefix :: String -> String -> String
-classNamePrefix namespace moduleName =
-    foldl (++) "" [
-        capitalize namespace,
-        "_",
-        capitalize moduleName,
-        "_",
+classNamePrefix :: ModuleInfo -> String
+classNamePrefix info =
+    join "_" [
+        capitalize $ getNamespace info,
+        capitalize $ getName info,
         "Model"
     ]
 
-className :: String -> String -> String -> String
-className namespace moduleName modelName =
-    foldl (++) "" [
-        classNamePrefix namespace moduleName,
-        "_",
+className :: ModuleInfo -> String -> String
+className info modelName =
+    join "_" [
+        classNamePrefix info,
         replace "/" "_" $ capitalizePath modelName
     ]

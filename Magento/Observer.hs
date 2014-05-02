@@ -5,52 +5,56 @@ module Magento.Observer (
 import System.FilePath.Posix (joinPath)
 import Template.Observer (observerXml, observerPhp)
 import Magento.Model (addModel)
-import Magento.Module (codeRootPath)
+import Magento.Module (
+    ModuleInfo,
+    codeRootPath,
+    getName,
+    getNamespace,
+    getConfigXml,
+    getFullName)
 import Util (camelcase, lowercase)
 import Util.XML (insertXmlIfMissing)
 import Util.PHP (insertPhpMethod)
 import Data.String.Utils (join)
 
-addObserver :: FilePath -> String -> String -> String -> String -> IO ()
-addObserver configXmlPath namespace moduleName scope eventName = do
-    insertObserverXmlIfMissing configXmlPath moduleName scope eventName
-    createObserverPhpIfMissing configXmlPath namespace moduleName eventName
+addObserver :: ModuleInfo -> String -> String -> IO ()
+addObserver info scope eventName = do
+    insertObserverXmlIfMissing info scope eventName
+    createObserverPhpIfMissing info eventName
 
-insertObserverXmlIfMissing :: FilePath -> String -> String -> String -> IO ()
-insertObserverXmlIfMissing configXmlPath moduleName scope eventName = do
+insertObserverXmlIfMissing :: ModuleInfo -> String -> String -> IO ()
+insertObserverXmlIfMissing info scope eventName = do
     xml <- observerXml
-        (lowercase moduleName) eventName (composeMethodName eventName)
-    insertXmlIfMissing configXmlPath (xpath scope eventName) xml
+        (lowercase $ getName info) eventName (methodName eventName)
+    insertXmlIfMissing (getConfigXml info) (xpath scope eventName) xml
+
+createObserverPhpIfMissing :: ModuleInfo -> String -> IO ()
+createObserverPhpIfMissing info eventName = do
+    -- Add observer model
+    addModel info "Observer"
+    insertObserverPhp (observerPath info) eventName
+
+insertObserverPhp :: FilePath -> String -> IO ()
+insertObserverPhp path eventName = do
+    php <- observerPhp $ methodName eventName
+    insertPhpMethod path php
 
 xpath :: String -> String -> String
 xpath scope eventName =
     join "" ["/config/", scopeName scope, "/events/", eventName]
 
-composeMethodName :: String -> String
-composeMethodName eventName = camelcase eventName
+methodName :: String -> String
+methodName eventName = camelcase eventName
 
 scopeName :: String -> String
 scopeName "frontend" = "frontend"
 scopeName "admin" = "adminhtml"
 scopeName "global" = "global"
 
-observerPath :: FilePath -> String
-observerPath configXmlPath =
+observerPath :: ModuleInfo -> String
+observerPath info =
     joinPath [
-        codeRootPath configXmlPath,
+        codeRootPath info,
         "Model",
         "Observer.php"
     ]
-
-createObserverPhpIfMissing :: FilePath -> String -> String -> String -> IO ()
-createObserverPhpIfMissing configXmlPath namespace moduleName eventName = do
-    -- Add observer model
-    addModel configXmlPath namespace moduleName "Observer"
-    insertObserverPhp
-        (observerPath configXmlPath)
-        (composeMethodName eventName)
-
-insertObserverPhp :: FilePath -> String -> IO ()
-insertObserverPhp path methodName = do
-    php <- observerPhp methodName
-    insertPhpMethod path php

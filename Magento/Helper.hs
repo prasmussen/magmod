@@ -6,68 +6,67 @@ import Control.Monad (when)
 import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Helper (helperXml, helperPhp)
-import Magento.Module (codeRootPath)
+import Magento.Module (
+    ModuleInfo,
+    codeRootPath,
+    getName,
+    getNamespace,
+    getConfigXml,
+    getFullName)
 import Util (
     writeFileAndPrint,
     capitalize,
     capitalizePath,
     lowercase)
-import Data.String.Utils (replace)
+import Data.String.Utils (replace, join)
 import Util.XML (insertXmlIfMissing)
 
 
-addHelper :: FilePath -> String -> String -> String -> IO ()
-addHelper configXmlPath namespace moduleName helperName = do
-    insertHelperXmlIfMissing configXmlPath namespace moduleName
-    createHelperPhpIfMissing configXmlPath namespace moduleName helperName
+addHelper :: ModuleInfo -> String -> IO ()
+addHelper info helperName = do
+    insertHelperXmlIfMissing info
+    createHelperPhpIfMissing info helperName
 
-insertHelperXmlIfMissing :: FilePath -> String -> String -> IO ()
-insertHelperXmlIfMissing configXmlPath namespace moduleName = do
-    xml <- helperXml
-        (lowercase moduleName)
-        (classNamePrefix namespace moduleName)
-    insertXmlIfMissing configXmlPath "/config/global/helpers" xml
+insertHelperXmlIfMissing :: ModuleInfo -> IO ()
+insertHelperXmlIfMissing info = do
+    xml <- helperXml (lowercase $ getName info) (classNamePrefix info)
+    insertXmlIfMissing (getConfigXml info) "/config/global/helpers" xml
 
-helperPath :: FilePath -> String -> String
-helperPath configXmlPath helperName =
+createHelperPhpIfMissing :: ModuleInfo -> String -> IO ()
+createHelperPhpIfMissing info helperName =
+    let path = helperPath info helperName in do
+        createDirectoryIfMissing True (takeDirectory path)
+        writeHelperPhpIfMissing info path helperName
+
+writeHelperPhpIfMissing :: ModuleInfo -> FilePath -> String -> IO ()
+writeHelperPhpIfMissing info path helperName = do
+    exists <- doesFileExist path
+    when (not exists) $ writeHelperPhp info path helperName
+
+writeHelperPhp :: ModuleInfo -> FilePath -> String -> IO ()
+writeHelperPhp info path helperName = do
+    php <- helperPhp $ className info helperName
+    writeFileAndPrint path php
+
+helperPath :: ModuleInfo -> String -> String
+helperPath info helperName =
     joinPath [
-        codeRootPath configXmlPath,
+        codeRootPath info,
         "Helper",
         (capitalizePath helperName) ++ ".php"
     ]
 
-createHelperPhpIfMissing :: FilePath -> String -> String -> String -> IO ()
-createHelperPhpIfMissing configXmlPath namespace moduleName helperName =
-    let path = helperPath configXmlPath helperName
-    in do
-        createDirectoryIfMissing True (takeDirectory path)
-        writeHelperPhpIfMissing path namespace moduleName helperName
-
-writeHelperPhpIfMissing :: FilePath -> String -> String -> String -> IO ()
-writeHelperPhpIfMissing path namespace moduleName helperName = do
-    exists <- doesFileExist path
-    when (not exists) $
-        writeHelperPhp path namespace moduleName helperName
-
-writeHelperPhp :: FilePath -> String -> String -> String -> IO ()
-writeHelperPhp path namespace moduleName helperName = do
-    php <- helperPhp $ className namespace moduleName helperName
-    writeFileAndPrint path php
-
-classNamePrefix :: String -> String -> String
-classNamePrefix namespace moduleName =
-    foldl (++) "" [
-        capitalize namespace,
-        "_",
-        capitalize moduleName,
-        "_",
+classNamePrefix :: ModuleInfo -> String
+classNamePrefix info =
+    join "_" [
+        capitalize $ getNamespace info,
+        capitalize $ getName info,
         "Helper"
     ]
 
-className :: String -> String -> String -> String
-className namespace moduleName helperName =
-    foldl (++) "" [
-        classNamePrefix namespace moduleName,
-        "_",
+className :: ModuleInfo -> String -> String
+className info helperName =
+    join "" [
+        classNamePrefix info,
         replace "/" "_" $ capitalizePath helperName
     ]

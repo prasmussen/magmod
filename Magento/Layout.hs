@@ -6,25 +6,30 @@ import Control.Monad (when)
 import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Layout (layoutXml, layoutConfigXml)
-import Magento.Module (basePath)
+import Magento.Module (
+    ModuleInfo,
+    basePath,
+    getName,
+    getNamespace,
+    getConfigXml,
+    getFullName)
 import Util (lowercase, writeFileAndPrint)
 import Util.XML (insertXmlIfMissing)
 
 
-addLayout :: FilePath -> String -> String -> IO ()
-addLayout configXmlPath moduleName scope = do
-    insertLayoutConfigXmlIfMissing configXmlPath moduleName scope
-    createLayoutXmlIfMissing configXmlPath moduleName scope
+addLayout :: ModuleInfo -> String -> IO ()
+addLayout info scope = do
+    insertLayoutConfigXmlIfMissing info scope
+    createLayoutXmlIfMissing info scope
 
-insertLayoutConfigXmlIfMissing :: FilePath -> String -> String -> IO ()
-insertLayoutConfigXmlIfMissing configXmlPath moduleName scope = do
-    xml <- layoutConfigXml (lowercase moduleName)
-    insertXmlIfMissing configXmlPath (xpath scope) xml
+insertLayoutConfigXmlIfMissing :: ModuleInfo -> String -> IO ()
+insertLayoutConfigXmlIfMissing info scope = do
+    xml <- layoutConfigXml (lowercase $ getName info)
+    insertXmlIfMissing (getConfigXml info) (xpath scope) xml
 
-createLayoutXmlIfMissing :: FilePath -> String -> String -> IO ()
-createLayoutXmlIfMissing configXmlPath moduleName scope =
-    let path = layoutPath configXmlPath moduleName scope
-    in do
+createLayoutXmlIfMissing :: ModuleInfo -> String -> IO ()
+createLayoutXmlIfMissing info scope =
+    let path = layoutPath info scope in do
         createDirectoryIfMissing True (takeDirectory path)
         writeLayoutXmlIfMissing path
 
@@ -46,15 +51,15 @@ scopeName :: String -> String
 scopeName "frontend" = "frontend"
 scopeName "admin" = "adminhtml"
 
-layoutPath :: FilePath -> String -> String -> FilePath
-layoutPath configXmlPath moduleName scope =
+layoutPath :: ModuleInfo -> String -> FilePath
+layoutPath info scope =
     joinPath [
-        basePath configXmlPath,
+        basePath info,
         "app",
         "design",
         scopeName scope,
         "base",
         "default",
         "layout",
-        (lowercase moduleName) ++ ".xml"
+        (lowercase $ getName info) ++ ".xml"
     ]

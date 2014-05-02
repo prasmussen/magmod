@@ -6,7 +6,13 @@ import Control.Monad (when)
 import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Controller (controllerXml, controllerPhp)
-import Magento.Module (codeRootPath, fullModuleName)
+import Magento.Module (
+    ModuleInfo,
+    codeRootPath,
+    getName,
+    getNamespace,
+    getConfigXml,
+    getFullName)
 import Util (
     writeFileAndPrint,
     capitalize,
@@ -16,20 +22,33 @@ import Data.String.Utils (replace, join)
 import Util.XML (insertXmlIfMissing)
 
 
-addController :: FilePath -> String -> String -> String -> String -> IO ()
-addController configXmlPath namespace moduleName scope controllerName = do
-    insertControllerXmlIfMissing
-        configXmlPath namespace moduleName scope
-    createControllerPhpIfMissing
-        configXmlPath namespace moduleName scope controllerName
+addController :: ModuleInfo -> String -> String -> IO ()
+addController info scope controllerName = do
+    insertCtrlXmlIfMissing info scope
+    createCtrlPhpIfMissing info scope controllerName
 
-insertControllerXmlIfMissing :: FilePath -> String -> String -> String -> IO ()
-insertControllerXmlIfMissing configXmlPath namespace moduleName scope = do
+insertCtrlXmlIfMissing :: ModuleInfo -> String -> IO ()
+insertCtrlXmlIfMissing info scope = do
     xml <- controllerXml
-        (lowercase moduleName)
-        (fullModuleName namespace moduleName)
-        (router scope)
-    insertXmlIfMissing configXmlPath (xpath scope) xml
+        (lowercase $ getName info) (getFullName info) (router scope)
+    insertXmlIfMissing (getConfigXml info) (xpath scope) xml
+
+createCtrlPhpIfMissing :: ModuleInfo -> String -> String -> IO ()
+createCtrlPhpIfMissing info scope controllerName =
+    let path = controllerPath info controllerName in do
+        createDirectoryIfMissing True (takeDirectory path)
+        writeCtrlPhpIfMissing info path scope controllerName
+
+writeCtrlPhpIfMissing :: ModuleInfo -> FilePath -> String -> String -> IO ()
+writeCtrlPhpIfMissing info path scope controllerName = do
+    exists <- doesFileExist path
+    when (not exists) $ writeCtrlPhp info path scope controllerName
+
+writeCtrlPhp :: ModuleInfo -> FilePath -> String -> String -> IO ()
+writeCtrlPhp info path scope controllerName = do
+    php <- controllerPhp
+        (className info controllerName) (parentClassName scope)
+    writeFileAndPrint path php
 
 xpath :: String -> String
 xpath "admin" = "/config/admin/routers"
@@ -39,49 +58,28 @@ router :: String -> String
 router "admin" = "admin"
 router "frontend" = "standard"
 
-controllerPath :: FilePath -> String -> String
-controllerPath configXmlPath controllerName =
+controllerPath :: ModuleInfo -> String -> String
+controllerPath info controllerName =
     joinPath [
-        codeRootPath configXmlPath,
+        codeRootPath info,
         "controllers",
         (capitalizePath controllerName) ++ "Controller.php"
-    ]
-
-createControllerPhpIfMissing :: FilePath -> String -> String -> String -> String -> IO ()
-createControllerPhpIfMissing configXmlPath namespace moduleName scope controllerName =
-    let path = controllerPath configXmlPath controllerName
-    in do
-        createDirectoryIfMissing True (takeDirectory path)
-        writeControllerPhpIfMissing
-            path namespace moduleName scope controllerName
-
-writeControllerPhpIfMissing :: FilePath -> String -> String -> String -> String -> IO ()
-writeControllerPhpIfMissing path namespace moduleName scope controllerName = do
-    exists <- doesFileExist path
-    when (not exists) $
-        writeControllerPhp path namespace moduleName scope controllerName
-
-writeControllerPhp :: FilePath -> String -> String -> String -> String -> IO ()
-writeControllerPhp path namespace moduleName scope controllerName = do
-    php <- controllerPhp
-        (className namespace moduleName controllerName)
-        (parentClassName scope)
-    writeFileAndPrint path php
-
-classNamePrefix :: String -> String -> String
-classNamePrefix namespace moduleName =
-    join "_" [
-        capitalize namespace,
-        capitalize moduleName
     ]
 
 classNameFromPath :: String -> String
 classNameFromPath path = replace "/" "_" $ capitalizePath path
 
-className :: String -> String -> String -> String
-className namespace moduleName controllerName =
+classNamePrefix :: ModuleInfo -> String
+classNamePrefix info =
     join "_" [
-        classNamePrefix namespace moduleName,
+        capitalize $ getNamespace info,
+        capitalize $ getName info
+    ]
+
+className :: ModuleInfo -> String -> String
+className info controllerName =
+    join "_" [
+        classNamePrefix info,
         (classNameFromPath controllerName) ++ "Controller"
     ]
 

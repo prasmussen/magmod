@@ -6,67 +6,66 @@ import Control.Monad (when)
 import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Block (blockXml, blockPhp)
-import Magento.Module (codeRootPath)
+import Magento.Module (
+    ModuleInfo,
+    codeRootPath,
+    getName,
+    getNamespace,
+    getConfigXml)
 import Util (
     writeFileAndPrint,
     capitalize,
     capitalizePath,
     lowercase)
-import Data.String.Utils (replace)
+import Data.String.Utils (replace, join)
 import Util.XML (insertXmlIfMissing)
 
 
-addBlock :: FilePath -> String -> String -> String -> IO ()
-addBlock configXmlPath namespace moduleName blockName = do
-    insertBlockXmlIfMissing configXmlPath namespace moduleName
-    createBlockPhpIfMissing configXmlPath namespace moduleName blockName
+addBlock :: ModuleInfo -> String -> IO ()
+addBlock info blockName = do
+    insertBlockXmlIfMissing info
+    createBlockPhpIfMissing info blockName
 
-insertBlockXmlIfMissing :: FilePath -> String -> String -> IO ()
-insertBlockXmlIfMissing configXmlPath namespace moduleName = do
-    xml <- blockXml
-        (lowercase moduleName)
-        (classNamePrefix namespace moduleName)
-    insertXmlIfMissing configXmlPath "/config/global/blocks" xml
+insertBlockXmlIfMissing :: ModuleInfo -> IO ()
+insertBlockXmlIfMissing info = do
+    xml <- blockXml (lowercase $ getName info) (classNamePrefix info)
+    insertXmlIfMissing (getConfigXml info) "/config/global/blocks" xml
 
-blockPath :: FilePath -> String -> String
-blockPath configXmlPath blockName =
+createBlockPhpIfMissing :: ModuleInfo -> String -> IO ()
+createBlockPhpIfMissing info blockName =
+    let path = blockPath info blockName in do
+        createDirectoryIfMissing True (takeDirectory path)
+        writeBlockPhpIfMissing info path blockName
+
+writeBlockPhpIfMissing :: ModuleInfo -> FilePath -> String -> IO ()
+writeBlockPhpIfMissing info path blockName = do
+    exists <- doesFileExist path
+    when (not exists) $ writeBlockPhp info path blockName
+
+writeBlockPhp :: ModuleInfo -> FilePath -> String -> IO ()
+writeBlockPhp info path blockName = do
+    php <- blockPhp $ className info blockName
+    writeFileAndPrint path php
+
+blockPath :: ModuleInfo -> String -> String
+blockPath info blockName =
     joinPath [
-        codeRootPath configXmlPath,
+        codeRootPath info,
         "Block",
         (capitalizePath blockName) ++ ".php"
     ]
 
-createBlockPhpIfMissing :: FilePath -> String -> String -> String -> IO ()
-createBlockPhpIfMissing configXmlPath namespace moduleName blockName =
-    let path = blockPath configXmlPath blockName
-    in do
-        createDirectoryIfMissing True (takeDirectory path)
-        writeBlockPhpIfMissing path namespace moduleName blockName
-
-writeBlockPhpIfMissing :: FilePath -> String -> String -> String -> IO ()
-writeBlockPhpIfMissing path namespace moduleName blockName = do
-    exists <- doesFileExist path
-    when (not exists) $ writeBlockPhp path namespace moduleName blockName
-
-writeBlockPhp :: FilePath -> String -> String -> String -> IO ()
-writeBlockPhp path namespace moduleName blockName = do
-    php <- blockPhp $ className namespace moduleName blockName
-    writeFileAndPrint path php
-
-classNamePrefix :: String -> String -> String
-classNamePrefix namespace moduleName =
-    foldl (++) "" [
-        capitalize namespace,
-        "_",
-        capitalize moduleName,
-        "_",
+classNamePrefix :: ModuleInfo -> String
+classNamePrefix info =
+    join "_" [
+        capitalize $ getNamespace info,
+        capitalize $ getName info,
         "Block"
     ]
 
-className :: String -> String -> String -> String
-className namespace moduleName blockName =
-    foldl (++) "" [
-        classNamePrefix namespace moduleName,
-        "_",
+className :: ModuleInfo -> String -> String
+className info blockName =
+    join "_" [
+        classNamePrefix info,
         replace "/" "_" $ capitalizePath blockName
     ]

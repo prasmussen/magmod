@@ -1,6 +1,6 @@
 import System.Environment (getArgs, getProgName)
-import Magento.Module (newModule, findConfigXml)
-import Magento.Module.XML (readNamespaceAndName)
+import Magento.Module (newModule, findConfigXml, ModuleInfo)
+import Magento.Module.XML (readModuleInfo)
 import Magento.Helper (addHelper)
 import Magento.Model (addModel)
 import Magento.Block (addBlock)
@@ -82,51 +82,51 @@ newModuleHandler codepool namespace name =
 
 addHelperHandler :: String -> IO ()
 addHelperHandler helperName =
-    isInsideModule (\configXmlPath namespace moduleName ->
-        addHelper configXmlPath namespace moduleName helperName)
+    withModuleInfo (\moduleInfo ->
+        addHelper moduleInfo helperName)
 
 addModelHandler :: String -> IO ()
 addModelHandler modelName =
-    isInsideModule (\configXmlPath namespace moduleName ->
-        addModel configXmlPath namespace moduleName modelName)
+    withModuleInfo (\moduleInfo ->
+        addModel moduleInfo modelName)
 
 addBlockHandler :: String -> IO ()
 addBlockHandler blockName =
-    isInsideModule (\configXmlPath namespace moduleName ->
-        addBlock configXmlPath namespace moduleName blockName)
+    withModuleInfo (\moduleInfo ->
+        addBlock moduleInfo blockName)
 
 addControllerHandler :: String -> String -> IO ()
 addControllerHandler scope controllerName =
-    isInsideModule (\configXmlPath namespace moduleName ->
-        addController configXmlPath namespace moduleName scope controllerName)
+    withModuleInfo (\moduleInfo ->
+        addController moduleInfo scope controllerName)
 
 addObserverHandler :: String -> String -> IO ()
 addObserverHandler scope eventName =
-    isInsideModule (\configXmlPath namespace moduleName ->
-        addObserver configXmlPath namespace moduleName scope eventName)
+    withModuleInfo (\moduleInfo ->
+        addObserver moduleInfo scope eventName)
 
 addResourceHandler :: String -> IO ()
 addResourceHandler entityName =
-    isInsideModule (\configXmlPath namespace moduleName ->
-        addResource configXmlPath namespace moduleName entityName)
+    withModuleInfo (\moduleInfo ->
+        addResource moduleInfo entityName)
 
 addLayoutHandler :: String -> IO ()
 addLayoutHandler scope =
-    isInsideModule (\configXmlPath _ moduleName ->
-        addLayout configXmlPath moduleName scope)
+    withModuleInfo (\moduleInfo ->
+        addLayout moduleInfo scope)
 
 addLocaleHandler :: String -> String -> IO ()
 addLocaleHandler scope localeName =
-    isInsideModule (\configXmlPath namespace moduleName ->
-        addLocale configXmlPath namespace moduleName scope localeName)
+    withModuleInfo (\moduleInfo ->
+        addLocale moduleInfo scope localeName)
 
-isInsideModule :: (FilePath -> String -> String -> IO ()) -> IO ()
-isInsideModule f = do
+withModuleInfo :: (ModuleInfo -> IO ()) -> IO ()
+withModuleInfo f = do
     maybePath <- findConfigXml
     case maybePath of
         Just path -> do
-            (namespace, name) <- readNamespaceAndName path
-            f path namespace name
+            moduleInfo <- readModuleInfo path
+            f moduleInfo
         Nothing -> do
             putStrLn "Found none or more than one config.xml"
             exitFailure

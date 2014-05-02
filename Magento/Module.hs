@@ -1,7 +1,12 @@
 module Magento.Module (
+    ModuleInfo,
+    moduleInfo,
+    getConfigXml,
+    getNamespace,
+    getName,
     newModule,
     findConfigXml,
-    fullModuleName,
+    getFullName,
     basePath,
     codeRootPath
 ) where
@@ -14,6 +19,13 @@ import Template.Module (moduleXml, configXml)
 import Util (capitalize, lowercase, ensureSinglePath, writeFileAndPrint)
 import Data.String.Utils (join)
 
+type ModuleInfo = ModuleInfoData
+
+data ModuleInfoData = ModuleInfoData {
+    getConfigXml :: String,
+    getName :: String,
+    getNamespace :: String
+}
 
 newModule :: String -> String -> String -> IO ()
 newModule codepool namespace name = do
@@ -29,21 +41,19 @@ findConfigXml :: IO (Maybe FilePath)
 findConfigXml =
     ensureSinglePath <$> find always (fileName ==? "config.xml") "."
 
-codeRootPath :: FilePath -> FilePath
-codeRootPath configXmlPath =
-    joinPath [takeDirectory configXmlPath, ".."]
+codeRootPath :: ModuleInfo -> FilePath
+codeRootPath info =
+    joinPath [takeDirectory $ getConfigXml info, ".."]
 
-basePath :: FilePath -> FilePath
-basePath configXmlPath =
-    joinPath $ (takeDirectory configXmlPath):(replicate 6 "..")
+basePath :: ModuleInfo -> FilePath
+basePath info =
+    joinPath $ (takeDirectory $ getConfigXml info):(replicate 6 "..")
 
 moduleXmlFname :: String -> String -> String
 moduleXmlFname namespace name =
-    foldl (++) "" [
+    join "_" [
         capitalize namespace,
-        "_",
-        capitalize name,
-        ".xml"
+        (capitalize name) ++ ".xml"
     ]
 
 composeModuleXmlPath :: String -> String -> String
@@ -71,12 +81,12 @@ composeConfigXmlPath codepool namespace name =
 
 writeModuleXml :: String -> String -> String -> String -> IO ()
 writeModuleXml path codepool namespace name = do
-    xml <- moduleXml (lowercase codepool) (fullModuleName namespace name)
+    xml <- moduleXml (lowercase codepool) (fullName namespace name)
     writeFileAndPrint path xml
 
 writeConfigXml :: String -> String -> String -> IO ()
 writeConfigXml path namespace name = do
-    xml <- configXml (fullModuleName namespace name)
+    xml <- configXml (fullName namespace name)
     writeFileAndPrint path xml
 
 createModuleXml :: String -> String -> String -> IO ()
@@ -93,6 +103,17 @@ createConfigXml codepool namespace name =
         createDirectoryIfMissing True (takeDirectory configXmlPath)
         writeConfigXml configXmlPath namespace name
 
-fullModuleName :: String -> String -> String
-fullModuleName namespace moduleName =
-    join "_" [capitalize namespace, capitalize moduleName]
+moduleInfo :: FilePath -> String -> String -> ModuleInfo
+moduleInfo configXmlPath namespace name =
+    ModuleInfoData{
+        getConfigXml=configXmlPath,
+        getNamespace=namespace,
+        getName=name
+    }
+
+
+fullName :: String -> String -> String
+fullName namespace name = join "_" [capitalize namespace, capitalize name]
+
+getFullName :: ModuleInfo -> String
+getFullName info = fullName (getNamespace info) (getName info)

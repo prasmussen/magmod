@@ -1,7 +1,8 @@
 module Magento.Module.XML (
-    readNamespaceAndName
+    readModuleInfo
 ) where
 
+import Magento.Module (ModuleInfo, moduleInfo, getConfigXml, getNamespace, getName)
 import Data.List.Split (splitOn)
 import Control.Category ((>>>))
 import Text.XML.HXT.Arrow.XmlState.RunIOStateArrow (runX)
@@ -11,14 +12,15 @@ import Text.XML.HXT.DOM.QualifiedName (localPart)
 import Text.XML.HXT.XPath.Arrows (getXPathTrees)
 
 
-readNamespaceAndName :: FilePath -> IO (String, String)
-readNamespaceAndName path = do
+readModuleInfo :: FilePath -> IO ModuleInfo
+readModuleInfo path = do
     names <- runX (
         readDocument [] path >>>
         getXPathTrees "/config/modules/*" >>>
         getElemName)
-    return $ namespaceAndName . localPart $ head names
+    return $ newModuleInfo path (localPart $ head names)
 
-namespaceAndName :: String -> (String, String)
-namespaceAndName str =
-    let [namespace, name] = splitOn "_" str in (namespace, name)
+newModuleInfo :: FilePath -> String -> ModuleInfo
+newModuleInfo path str =
+    let [namespace, name] = splitOn "_" str in
+        moduleInfo path namespace name

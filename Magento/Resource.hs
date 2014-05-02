@@ -11,7 +11,13 @@ import Template.Resource (
     modelConstructor,
     resourcePhp,
     collectionPhp)
-import Magento.Module (codeRootPath, fullModuleName)
+import Magento.Module (
+    ModuleInfo,
+    codeRootPath,
+    getName,
+    getNamespace,
+    getConfigXml,
+    getFullName)
 import Magento.Model (addModel, modelPath)
 import Util (
     writeFileAndPrint,
@@ -23,138 +29,127 @@ import Util.XML (insertXmlIfMissing)
 import Util.PHP (insertPhpMethod)
 
 
-addResource :: FilePath -> String -> String -> String -> IO ()
-addResource configXmlPath namespace moduleName entityName = do
-    addModel configXmlPath namespace moduleName entityName
-    insertModelConstructor
-        (modelPath configXmlPath entityName) moduleName entityName
-    insertModelResourceXmlIfMissing configXmlPath moduleName
-    insertResourceXmlIfMissing configXmlPath namespace moduleName
-    insertEntityXmlIfMissing configXmlPath moduleName entityName
-    createResourcePhpIfMissing
-        configXmlPath namespace moduleName entityName
-    createCollectionPhpIfMissing
-        configXmlPath namespace moduleName entityName
+addResource :: ModuleInfo -> String -> IO ()
+addResource info entityName = do
+    addModel info entityName
+    insertModelConstructor info (modelPath info entityName) entityName
+    insertModelResourceXmlIfMissing info
+    insertResourceXmlIfMissing info
+    insertEntityXmlIfMissing info entityName
+    createResourcePhpIfMissing info entityName
+    createCollectionPhpIfMissing info entityName
 
-insertModelConstructor :: FilePath -> String -> String -> IO ()
-insertModelConstructor path moduleName entityName = do
-    php <- modelConstructor (lowercase moduleName) (lowercase entityName)
+insertModelConstructor :: ModuleInfo -> FilePath -> String -> IO ()
+insertModelConstructor info path entityName = do
+    php <- modelConstructor (lowercase $ getName info) (lowercase entityName)
     insertPhpMethod path php
 
-insertModelResourceXmlIfMissing :: FilePath -> String -> IO ()
-insertModelResourceXmlIfMissing configXmlPath moduleName = do
+insertModelResourceXmlIfMissing :: ModuleInfo -> IO ()
+insertModelResourceXmlIfMissing info =
     insertXmlIfMissing
-        configXmlPath modelResourceXpath (modelResourceXml moduleName)
+        (getConfigXml info) modelResourceXpath (modelResourceXml info)
 
-insertResourceXmlIfMissing :: FilePath -> String -> String -> IO ()
-insertResourceXmlIfMissing configXmlPath namespace moduleName = do
-    xml <- resourceXml
-        (classPrefix namespace moduleName)
-        (resourceName moduleName)
-    insertXmlIfMissing configXmlPath (resourceXpath moduleName) xml
+insertResourceXmlIfMissing :: ModuleInfo -> IO ()
+insertResourceXmlIfMissing info = do
+    xml <- resourceXml (classPrefix info) (resourceName info)
+    insertXmlIfMissing (getConfigXml info) (resourceXpath info) xml
 
-insertEntityXmlIfMissing :: FilePath -> String -> String -> IO ()
-insertEntityXmlIfMissing configXmlPath moduleName entityName = do
-    xml <- entityXml entityName (tableName moduleName entityName)
-    insertXmlIfMissing configXmlPath (entityXpath entityName) xml
+insertEntityXmlIfMissing :: ModuleInfo -> String -> IO ()
+insertEntityXmlIfMissing info entityName = do
+    xml <- entityXml entityName $ tableName info entityName
+    insertXmlIfMissing (getConfigXml info) (entityXpath entityName) xml
 
-createResourcePhpIfMissing :: FilePath -> String -> String -> String -> IO ()
-createResourcePhpIfMissing configXmlPath namespace moduleName entityName =
-    let path = resourcePath configXmlPath entityName
-    in do
+createResourcePhpIfMissing :: ModuleInfo -> String -> IO ()
+createResourcePhpIfMissing info entityName =
+    let path = resourcePath info entityName in do
         createDirectoryIfMissing True (takeDirectory path)
-        writeResourcePhpIfMissing
-            path namespace moduleName entityName
+        writeResourcePhpIfMissing info path entityName
 
-writeResourcePhpIfMissing :: FilePath -> String -> String -> String -> IO ()
-writeResourcePhpIfMissing path namespace moduleName entityName = do
+writeResourcePhpIfMissing :: ModuleInfo -> FilePath -> String -> IO ()
+writeResourcePhpIfMissing info path entityName = do
     exists <- doesFileExist path
-    when (not exists) $
-        writeResourcePhp path namespace moduleName entityName
+    when (not exists) $ writeResourcePhp info path entityName
 
-writeResourcePhp :: FilePath -> String -> String -> String -> IO ()
-writeResourcePhp path namespace moduleName entityName = do
+writeResourcePhp :: ModuleInfo -> FilePath -> String -> IO ()
+writeResourcePhp info path entityName = do
     php <- resourcePhp
-        (lowercase moduleName)
-        (className namespace moduleName entityName)
+        (lowercase $ getName info)
+        (className info entityName)
         (lowercase entityName)
     writeFileAndPrint path php
 
-createCollectionPhpIfMissing :: FilePath -> String -> String -> String -> IO ()
-createCollectionPhpIfMissing configXmlPath namespace moduleName entityName =
-    let path = collectionPath configXmlPath entityName
-    in do
+createCollectionPhpIfMissing :: ModuleInfo -> String -> IO ()
+createCollectionPhpIfMissing info entityName =
+    let path = collectionPath info entityName in do
         createDirectoryIfMissing True (takeDirectory path)
-        writeCollectionPhpIfMissing
-            path namespace moduleName entityName
+        writeCollectionPhpIfMissing info path entityName
 
-writeCollectionPhpIfMissing :: FilePath -> String -> String -> String -> IO ()
-writeCollectionPhpIfMissing path namespace moduleName entityName = do
+writeCollectionPhpIfMissing :: ModuleInfo -> FilePath -> String -> IO ()
+writeCollectionPhpIfMissing info path entityName = do
     exists <- doesFileExist path
-    when (not exists) $
-        writeCollectionPhp path namespace moduleName entityName
+    when (not exists) $ writeCollectionPhp info path entityName
 
-writeCollectionPhp :: FilePath -> String -> String -> String -> IO ()
-writeCollectionPhp path namespace moduleName entityName = do
+writeCollectionPhp :: ModuleInfo -> FilePath -> String -> IO ()
+writeCollectionPhp info path entityName = do
     php <- collectionPhp
-        (lowercase moduleName)
-        (className namespace moduleName entityName)
+        (lowercase $ getName info)
+        (className info entityName)
         (lowercase entityName)
     writeFileAndPrint path php
 
-modelResourceXml :: String -> String
-modelResourceXml moduleName =
-    "<resourceModel>" ++ (resourceName moduleName)  ++ "</resourceModel>"
+modelResourceXml :: ModuleInfo -> String
+modelResourceXml info =
+    "<resourceModel>" ++ (resourceName info)  ++ "</resourceModel>"
 
 modelResourceXpath :: String
 modelResourceXpath = "/config/global/models/*[not(entities)]/resourceModel"
 
-resourceXpath :: String -> String
-resourceXpath moduleName =
-    join "" ["/config/global/models/", resourceName moduleName]
+resourceXpath :: ModuleInfo -> String
+resourceXpath info =
+    join "" ["/config/global/models/", resourceName info]
 
 entityXpath :: String -> String
 entityXpath entityName =
     join "" ["/config/global/models/*/entities/", entityName]
 
-resourcePath :: FilePath -> String -> String
-resourcePath configXmlPath entityName =
+resourcePath :: ModuleInfo -> String -> String
+resourcePath info entityName =
     joinPath [
-        codeRootPath configXmlPath,
+        codeRootPath info,
         "Model",
         "Resource",
         (capitalizePath entityName) ++ ".php"
     ]
 
-collectionPath :: FilePath -> String -> String
-collectionPath configXmlPath entityName =
-    let path = resourcePath configXmlPath entityName in
+collectionPath :: ModuleInfo -> String -> String
+collectionPath info entityName =
+    let path = resourcePath info entityName in
         joinPath [
             takeDirectory path,
             takeBaseName path,
             "Collection.php"
         ]
 
-classPrefix :: String -> String -> String
-classPrefix namespace moduleName =
+classPrefix :: ModuleInfo -> String
+classPrefix info =
     join "_" [
-        capitalize namespace,
-        capitalize moduleName,
+        capitalize $ getNamespace info,
+        capitalize $ getName info,
         "Model",
         "Resource"
     ]
 
-resourceName :: String -> String
-resourceName moduleName =
-    join "_" [lowercase moduleName, "resource"]
+resourceName :: ModuleInfo -> String
+resourceName info =
+    join "_" [lowercase $ getName info, "resource"]
 
-tableName :: String -> String -> String
-tableName moduleName entityName =
-    join "_" [lowercase moduleName, lowercase entityName]
+tableName :: ModuleInfo -> String -> String
+tableName info entityName =
+    join "_" [lowercase $ getName info, lowercase entityName]
 
-className :: String -> String -> String -> String
-className namespace moduleName entityName =
+className :: ModuleInfo -> String -> String
+className info entityName =
     join "_" [
-        classPrefix namespace moduleName,
+        classPrefix info,
         (capitalize entityName)
     ]

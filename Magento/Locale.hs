@@ -6,7 +6,12 @@ import Control.Monad (when)
 import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Locale (localeXml)
-import Magento.Module (basePath, codeRootPath, fullModuleName)
+import Magento.Module (
+    ModuleInfo,
+    basePath,
+    getName,
+    getConfigXml,
+    getFullName)
 import Util (
     writeFileAndPrint,
     capitalize,
@@ -16,22 +21,19 @@ import Data.String.Utils (join)
 import Util.XML (insertXmlIfMissing)
 
 
-addLocale :: FilePath -> String -> String -> String -> String -> IO ()
-addLocale configXmlPath namespace moduleName scope localeName = do
-    insertLocaleXmlIfMissing configXmlPath namespace moduleName scope
-    createLocaleCsvIfMissing configXmlPath namespace moduleName localeName
+addLocale :: ModuleInfo -> String -> String -> IO ()
+addLocale info scope localeName = do
+    insertLocaleXmlIfMissing info scope
+    createLocaleCsvIfMissing info localeName
 
-insertLocaleXmlIfMissing :: FilePath -> String -> String -> String -> IO ()
-insertLocaleXmlIfMissing configXmlPath namespace moduleName scope = do
-    xml <- localeXml
-        (lowercase $ fullModuleName namespace moduleName)
-        (localeFname namespace moduleName)
-    insertXmlIfMissing configXmlPath (xpath scope) xml
+insertLocaleXmlIfMissing :: ModuleInfo -> String -> IO ()
+insertLocaleXmlIfMissing info scope = do
+    xml <- localeXml (lowercase $ getFullName info) (localeFname info)
+    insertXmlIfMissing (getConfigXml info) (xpath scope) xml
 
-createLocaleCsvIfMissing :: FilePath -> String -> String -> String -> IO ()
-createLocaleCsvIfMissing configXmlPath namespace moduleName localeName =
-    let path = localePath configXmlPath namespace moduleName localeName
-    in do
+createLocaleCsvIfMissing :: ModuleInfo -> String -> IO ()
+createLocaleCsvIfMissing info localeName =
+    let path = localePath info localeName in do
         createDirectoryIfMissing True (takeDirectory path)
         writeLocaleCsvIfMissing path
 
@@ -47,16 +49,16 @@ scopeName :: String -> String
 scopeName "frontend" = "frontend"
 scopeName "admin" = "adminhtml"
 
-localeFname :: String -> String -> String
-localeFname namespace moduleName =
-    join "" [fullModuleName namespace moduleName, ".csv"]
+localeFname :: ModuleInfo -> String
+localeFname info =
+    join "" [getFullName info, ".csv"]
 
-localePath :: FilePath -> String -> String -> String -> String
-localePath configXmlPath namespace moduleName localeName =
+localePath :: ModuleInfo -> String -> String
+localePath info localeName =
     joinPath [
-        basePath configXmlPath,
+        basePath info,
         "app",
         "locale",
         localeName,
-        localeFname namespace moduleName
+        localeFname info
     ]
