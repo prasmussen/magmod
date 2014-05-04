@@ -1,0 +1,10 @@
+<resources>
+  <{{setupIdentifier}}>
+    <setup>
+      <module>{{fullModuleName}}</module>
+    </setup>
+    <connection>
+      <use>core_setup</use>
+    </connection>
+  </{{setupIdentifier}}>
+</resources>

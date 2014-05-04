@@ -9,6 +9,7 @@ import Magento.Observer (addObserver)
 import Magento.Resource (addResource)
 import Magento.Layout (addLayout)
 import Magento.Locale (addLocale)
+import Magento.Setup (addInstall, addUpgrade)
 import System.Exit (exitFailure)
 
 
@@ -49,6 +50,8 @@ dispatch args = case args of
         addLocaleHandler "frontend" name
     ["add", "locale", "admin", name] ->
         addLocaleHandler "admin" name
+    ["add", "install"] -> addInstallHandler
+    ["add", "upgrade"] -> addUpgradeHandler
     ["help"] -> helpHandler
     ["-h"] -> helpHandler
     ["--help"] -> helpHandler
@@ -74,7 +77,9 @@ helpHandler = do
         "add layout frontend",
         "add layout admin",
         "add locale frontend <locale>",
-        "add locale admin <locale>"]
+        "add locale admin <locale>",
+        "add install",
+        "add upgrade"]
 
 newModuleHandler :: String -> String -> String -> IO ()
 newModuleHandler codepool namespace name =
@@ -119,6 +124,16 @@ addLocaleHandler :: String -> String -> IO ()
 addLocaleHandler scope localeName =
     withModuleInfo (\moduleInfo ->
         addLocale moduleInfo scope localeName)
+
+addInstallHandler :: IO ()
+addInstallHandler =
+    withModuleInfo (\moduleInfo ->
+        addInstall moduleInfo)
+
+addUpgradeHandler :: IO ()
+addUpgradeHandler =
+    withModuleInfo (\moduleInfo ->
+        addUpgrade moduleInfo)
 
 withModuleInfo :: (ModuleInfo -> IO ()) -> IO ()
 withModuleInfo f = do

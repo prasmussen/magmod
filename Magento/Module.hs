@@ -6,15 +6,16 @@ module Magento.Module (
     getName,
     newModule,
     findConfigXml,
+    findSetupFiles,
     getFullName,
     basePath,
     codeRootPath
 ) where
 
 import System.Directory (createDirectoryIfMissing, doesDirectoryExist)
-import System.FilePath.Posix (joinPath, takeDirectory)
+import System.FilePath.Posix (joinPath, takeDirectory, takeBaseName)
 import Data.Functor ((<$>))
-import System.FilePath.Find (find, always, fileName, (==?))
+import System.FilePath.Glob (globDir, compile)
 import Template.Module (moduleXml, configXml)
 import Util (capitalize, lowercase, ensureSinglePath, writeFileAndPrint)
 import Data.String.Utils (join)
@@ -39,7 +40,13 @@ newModule codepool namespace name = do
 
 findConfigXml :: IO (Maybe FilePath)
 findConfigXml =
-    ensureSinglePath <$> find always (fileName ==? "config.xml") "."
+    ensureSinglePath . concat . fst <$>
+        globDir [compile "**/config.xml"] "."
+
+findSetupFiles :: IO [String]
+findSetupFiles =
+    (map takeBaseName) . concat . fst <$>
+        globDir (map compile ["**/install-*.php", "**/upgrade-*.php"]) "."
 
 codeRootPath :: ModuleInfo -> FilePath
 codeRootPath info =

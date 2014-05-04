@@ -26,9 +26,10 @@ executable magmod
                        split ==0.2.*,
                        mtl ==2.1.*,
                        utf8-string ==0.3.*,
+                       regex-posix ==0.95.*,
                        MissingH ==1.2.*,
                        file-embed ==0.0.*,
                        hastache ==0.6.*,
                        hxt ==9.3.*,
                        hxt-xpath ==9.1.*,
-                       filemanip ==0.3.*
+                       Glob ==0.7.*
