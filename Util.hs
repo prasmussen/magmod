@@ -69,14 +69,15 @@ ensureSinglePath paths =
         _ -> Nothing
 
 renameWithBackupAndPrint :: FilePath -> FilePath -> IO ()
-renameWithBackupAndPrint old new = do
-    -- Do not create backup of destination file
-    -- if it has been modified within the last 3 seconds
-    recentlyModified <- fileRecentlyModified new 3
-    M.when (not recentlyModified) $ copyFile new (backupFname new)
-    renameFile old new
-    copyPermissions (backupFname new) new
-    prettyPath new (\x -> putStrLn $ "-- Updated " ++ x)
+renameWithBackupAndPrint old new =
+    let backup = backupFname new in do
+        -- Do not create backup of destination file
+        -- if a backup was taken less than 3 seconds ago
+        recentlyModified <- fileRecentlyModified backup 3
+        M.when (not recentlyModified) $ copyFile new backup
+        renameFile old new
+        copyPermissions backup new
+        prettyPath new (\x -> putStrLn $ "-- Updated " ++ x)
 
 fileRecentlyModified :: FilePath -> NominalDiffTime -> IO Bool
 fileRecentlyModified p s =
