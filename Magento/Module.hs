@@ -22,7 +22,7 @@ import Data.String.Utils (join)
 
 type ModuleInfo = ModuleInfoData
 
-data ModuleInfoData = ModuleInfoData {
+data ModuleInfoData = ModuleInfo {
     getConfigXml :: String,
     getName :: String,
     getNamespace :: String
@@ -112,7 +112,7 @@ createConfigXml codepool namespace name =
 
 moduleInfo :: FilePath -> String -> String -> ModuleInfo
 moduleInfo configXmlPath namespace name =
-    ModuleInfoData{
+    ModuleInfo{
         getConfigXml=configXmlPath,
         getNamespace=namespace,
         getName=name
