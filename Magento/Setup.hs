@@ -9,7 +9,7 @@ import Control.Monad (when)
 import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Setup (setupXml, installPhp, upgradePhp)
-import Magento.Module.XML (readVersion, readEntities)
+import Magento.Module.Config (readVersion, readEntities)
 import Magento.Module.Version (
     Version,
     incrementMinor,

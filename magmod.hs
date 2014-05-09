@@ -1,6 +1,6 @@
 import System.Environment (getArgs, getProgName)
 import Magento.Module (newModule, findConfigXml, ModuleInfo)
-import Magento.Module.XML (readModuleInfo)
+import Magento.Module.Config (readModuleInfo)
 import Magento.Helper (addHelper)
 import Magento.Model (addModel)
 import Magento.Block (addBlock)

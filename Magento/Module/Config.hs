@@ -1,4 +1,4 @@
-module Magento.Module.XML (
+module Magento.Module.Config (
     readModuleInfo,
     readVersion,
     readEntities
