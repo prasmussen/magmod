@@ -10,6 +10,7 @@ import Magento.Resource (addResource)
 import Magento.Layout (addLayout)
 import Magento.Locale (addLocale)
 import Magento.Setup (addInstall, addUpgrade)
+import Util (removeTempFiles)
 import System.Exit (exitFailure)
 
 
@@ -52,6 +53,7 @@ dispatch args = case args of
         addLocaleHandler "admin" name
     ["add", "install"] -> addInstallHandler
     ["add", "upgrade"] -> addUpgradeHandler
+    ["clean"] -> cleanHandler
     ["help"] -> helpHandler
     ["-h"] -> helpHandler
     ["--help"] -> helpHandler
@@ -79,7 +81,8 @@ helpHandler = do
         "add locale frontend <locale>",
         "add locale admin <locale>",
         "add install",
-        "add upgrade"]
+        "add upgrade",
+        "clean"]
 
 newModuleHandler :: String -> String -> String -> IO ()
 newModuleHandler codepool namespace name =
@@ -134,6 +137,11 @@ addUpgradeHandler :: IO ()
 addUpgradeHandler =
     withModuleInfo (\moduleInfo ->
         addUpgrade moduleInfo)
+
+cleanHandler :: IO ()
+cleanHandler = do
+    files <- removeTempFiles
+    mapM_ (putStrLn . ("Removed " ++)) files
 
 withModuleInfo :: (ModuleInfo -> IO ()) -> IO ()
 withModuleInfo f = do

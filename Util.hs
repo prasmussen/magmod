@@ -6,6 +6,7 @@ module Util (
     ensureSinglePath,
     tmpFname,
     backupFname,
+    removeTempFiles,
     renameWithBackupAndPrint,
     writeFileAndPrint
 ) where
@@ -16,10 +17,12 @@ import Data.Time.Clock (getCurrentTime, diffUTCTime, NominalDiffTime)
 import Control.Applicative ((<$>), (<*>))
 import Data.String.Utils as U
 import Data.Char (toUpper, toLower)
+import System.FilePath.Glob (globDir, compile)
 import System.Directory (
     makeRelativeToCurrentDirectory,
     canonicalizePath,
     copyPermissions,
+    removeFile,
     renameFile,
     copyFile,
     getModificationTime)
@@ -86,6 +89,16 @@ fileRecentlyModified p s =
         if isDoesNotExistError e
             then return False
             else ioError e
+
+removeTempFiles :: IO [FilePath]
+removeTempFiles = do
+    files <- findTempFiles
+    mapM_ removeFile files
+    return files
+
+findTempFiles :: IO [FilePath]
+findTempFiles =
+    concat . fst <$> globDir (map compile ["**/.*_bk.*", "**/.*_new.*"]) "."
 
 tmpFname :: FilePath -> FilePath
 tmpFname path =
