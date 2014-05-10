@@ -10,6 +10,7 @@ import Magento.Resource (addResource)
 import Magento.Layout (addLayout)
 import Magento.Template (addTemplate)
 import Magento.Skin (addSkin)
+import Magento.JS (addJs)
 import Magento.Locale (addLocale)
 import Magento.Setup (addInstall, addUpgrade)
 import Util (removeTempFiles)
@@ -57,6 +58,8 @@ dispatch args = case args of
         addSkinHandler "frontend" name
     ["add", "skin", "admin", name] ->
         addSkinHandler "admin" name
+    ["add", "js", name] ->
+        addJsHandler name
     ["add", "locale", "frontend", name] ->
         addLocaleHandler "frontend" name
     ["add", "locale", "admin", name] ->
@@ -92,6 +95,7 @@ helpHandler = do
         "add template admin <name>",
         "add skin frontend <name>",
         "add skin admin <name>",
+        "add js <name>",
         "add locale frontend <locale>",
         "add locale admin <locale>",
         "add install",
@@ -146,6 +150,11 @@ addSkinHandler :: String -> String -> IO ()
 addSkinHandler scope name =
     withModuleInfo (\moduleInfo ->
         addSkin moduleInfo scope name)
+
+addJsHandler :: String -> IO ()
+addJsHandler name =
+    withModuleInfo (\moduleInfo ->
+        addJs moduleInfo name)
 
 addLocaleHandler :: String -> String -> IO ()
 addLocaleHandler scope localeName =
