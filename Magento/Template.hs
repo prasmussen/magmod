@@ -37,8 +37,8 @@ scopeName :: String -> String
 scopeName "frontend" = "frontend"
 scopeName "admin" = "adminhtml"
 
-stripPhtml :: String -> String
-stripPhtml str = replace ".phtml" "" str
+ensurePhtmlExt :: String -> String
+ensurePhtmlExt str = (replace ".phtml" "" str) ++ ".phtml"
 
 templatePath :: ModuleInfo -> String -> String -> FilePath
 templatePath info scope name =
@@ -51,5 +51,5 @@ templatePath info scope name =
         "default",
         "template",
         lowercase $ getName info,
-        (stripPhtml . lowercase $ name) ++ ".phtml"
+        ensurePhtmlExt $ lowercase name
     ]
