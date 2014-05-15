@@ -66,7 +66,7 @@ classNamePrefix info =
 
 className :: ModuleInfo -> String -> String
 className info helperName =
-    join "" [
+    join "_" [
         classNamePrefix info,
         replace "/" "_" $ capitalizePath helperName
     ]
