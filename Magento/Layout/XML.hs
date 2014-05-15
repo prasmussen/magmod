@@ -12,14 +12,15 @@ import System.FilePath.Posix (
     splitDirectories)
 import Template.Layout (genXml)
 import Magento.Controller (parentClassName)
-import Magento.Module (
-    ModuleInfo,
+import Magento.Module.Path (
     basePath,
     jsBasePath,
     skinBasePath,
     templateBasePath,
     blockBasePath,
-    controllersBasePath,
+    controllersBasePath)
+import Magento.Module (
+    ModuleInfo,
     getName,
     getNamespace,
     getConfigXml,

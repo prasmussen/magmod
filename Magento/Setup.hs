@@ -16,10 +16,10 @@ import Magento.Module.Version (
     parseVersion,
     parseVersionRange,
     showVersion)
+import Magento.Module.Path (setupBasePath)
 import Magento.Module (
     ModuleInfo,
     findSetupFiles,
-    setupBasePath,
     getFullName,
     getName,
     getNamespace,

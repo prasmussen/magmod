@@ -11,9 +11,9 @@ import Template.Resource (
     modelConstructor,
     resourcePhp,
     collectionPhp)
+import Magento.Module.Path (resourceBasePath)
 import Magento.Module (
     ModuleInfo,
-    resourceBasePath,
     getName,
     getNamespace,
     getConfigXml,

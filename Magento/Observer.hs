@@ -5,9 +5,9 @@ module Magento.Observer (
 import System.FilePath.Posix (joinPath)
 import Template.Observer (observerXml, observerPhp)
 import Magento.Model (addModel)
+import Magento.Module.Path (modelBasePath)
 import Magento.Module (
     ModuleInfo,
-    modelBasePath,
     getName,
     getNamespace,
     getConfigXml,

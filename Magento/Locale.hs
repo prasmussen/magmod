@@ -6,9 +6,9 @@ import Control.Monad (when)
 import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Locale (localeXml)
+import Magento.Module.Path (localeBasePath)
 import Magento.Module (
     ModuleInfo,
-    localeBasePath,
     getName,
     getConfigXml,
     getFullName)

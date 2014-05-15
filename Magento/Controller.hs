@@ -7,9 +7,9 @@ import Control.Monad (when)
 import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Controller (controllerXml, controllerPhp)
+import Magento.Module.Path (controllersBasePath)
 import Magento.Module (
     ModuleInfo,
-    controllersBasePath,
     getName,
     getNamespace,
     getConfigXml,

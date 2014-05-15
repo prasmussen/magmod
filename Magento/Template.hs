@@ -6,9 +6,9 @@ import Control.Monad (when)
 import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath.Posix (joinPath, takeDirectory)
 import Data.String.Utils (replace)
+import Magento.Module.Path (templateBasePath)
 import Magento.Module (
     ModuleInfo,
-    templateBasePath,
     getName)
 import Util (lowercase, writeFileAndPrint)
 import Util.XML (insertXmlIfMissing)

@@ -6,9 +6,9 @@ import Control.Monad (when)
 import System.Directory (createDirectoryIfMissing, doesFileExist)
 import System.FilePath.Posix (joinPath, takeDirectory)
 import Data.String.Utils (replace)
+import Magento.Module.Path (jsBasePath)
 import Magento.Module (
     ModuleInfo,
-    jsBasePath,
     getName)
 import Util (lowercase, writeFileAndPrint)
 
