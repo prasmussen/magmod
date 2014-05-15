@@ -13,7 +13,7 @@ import Template.Resource (
     collectionPhp)
 import Magento.Module (
     ModuleInfo,
-    codeRootPath,
+    resourceBasePath,
     getName,
     getNamespace,
     getConfigXml,
@@ -115,9 +115,7 @@ entityXpath entityName =
 resourcePath :: ModuleInfo -> String -> String
 resourcePath info entityName =
     joinPath [
-        codeRootPath info,
-        "Model",
-        "Resource",
+        resourceBasePath info,
         (capitalizePath entityName) ++ ".php"
     ]
 

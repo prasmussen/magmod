@@ -8,7 +8,7 @@ import System.FilePath.Posix (joinPath, takeDirectory)
 import Data.String.Utils (replace)
 import Magento.Module (
     ModuleInfo,
-    basePath,
+    templateBasePath,
     getName)
 import Util (lowercase, writeFileAndPrint)
 import Util.XML (insertXmlIfMissing)
@@ -43,13 +43,7 @@ ensurePhtmlExt str = (replace ".phtml" "" str) ++ ".phtml"
 templatePath :: ModuleInfo -> String -> String -> FilePath
 templatePath info scope name =
     joinPath [
-        basePath info,
-        "app",
-        "design",
-        scopeName scope,
-        "base",
-        "default",
-        "template",
+        templateBasePath info (scopeName scope),
         lowercase $ getName info,
         ensurePhtmlExt $ lowercase name
     ]

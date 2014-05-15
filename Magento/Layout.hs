@@ -8,7 +8,7 @@ import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Layout (layoutXml, layoutConfigXml)
 import Magento.Module (
     ModuleInfo,
-    basePath,
+    layoutBasePath,
     getName,
     getNamespace,
     getConfigXml,
@@ -54,12 +54,6 @@ scopeName "admin" = "adminhtml"
 layoutPath :: ModuleInfo -> String -> FilePath
 layoutPath info scope =
     joinPath [
-        basePath info,
-        "app",
-        "design",
-        scopeName scope,
-        "base",
-        "default",
-        "layout",
+        layoutBasePath info (scopeName scope),
         (lowercase $ getName info) ++ ".xml"
     ]

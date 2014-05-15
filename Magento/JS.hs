@@ -8,7 +8,7 @@ import System.FilePath.Posix (joinPath, takeDirectory)
 import Data.String.Utils (replace)
 import Magento.Module (
     ModuleInfo,
-    basePath,
+    jsBasePath,
     getName)
 import Util (lowercase, writeFileAndPrint)
 
@@ -38,8 +38,7 @@ ensureJsExt str = (replace ".js" "" str) ++ ".js"
 jsPath :: ModuleInfo -> String -> FilePath
 jsPath info name =
     joinPath [
-        basePath info,
-        "js",
+        jsBasePath info,
         lowercase $ getName info,
         ensureJsExt $ lowercase name
     ]

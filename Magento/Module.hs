@@ -14,6 +14,12 @@ module Magento.Module (
     templateBasePath,
     controllersBasePath,
     blockBasePath,
+    modelBasePath,
+    helperBasePath,
+    layoutBasePath,
+    localeBasePath,
+    resourceBasePath,
+    setupBasePath,
     codeRootPath
 ) where
 
@@ -101,11 +107,63 @@ blockBasePath info =
         "Block"
     ]
 
+helperBasePath :: ModuleInfo -> FilePath
+helperBasePath info =
+    joinPath [
+        codeRootPath info,
+        "Helper"
+    ]
+
+modelBasePath :: ModuleInfo -> String
+modelBasePath info =
+    joinPath [
+        codeRootPath info,
+        "Model"
+    ]
+
+resourceBasePath :: ModuleInfo -> String
+resourceBasePath info =
+    joinPath [
+        modelBasePath info,
+        "Resource"
+    ]
+
+setupBasePath :: ModuleInfo -> String
+setupBasePath info =
+    joinPath [
+        codeRootPath info,
+        "sql"
+    ]
+
 controllersBasePath :: ModuleInfo -> FilePath
 controllersBasePath info =
     joinPath [
         codeRootPath info,
         "controllers"
+    ]
+
+layoutBasePath :: ModuleInfo -> String -> FilePath
+layoutBasePath info "frontend" = layoutBasePath' info "frontend"
+layoutBasePath info "adminhtml" = layoutBasePath' info "adminhtml"
+
+layoutBasePath' :: ModuleInfo -> String -> FilePath
+layoutBasePath' info scope =
+    joinPath [
+        basePath info,
+        "app",
+        "design",
+        scope,
+        "base",
+        "default",
+        "layout"
+    ]
+
+localeBasePath :: ModuleInfo -> String
+localeBasePath info =
+    joinPath [
+        basePath info,
+        "app",
+        "locale"
     ]
 
 moduleXmlFname :: String -> String -> String

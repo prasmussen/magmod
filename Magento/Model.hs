@@ -9,7 +9,7 @@ import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Model (modelXml, modelPhp)
 import Magento.Module (
     ModuleInfo,
-    codeRootPath,
+    modelBasePath,
     getName,
     getNamespace,
     getConfigXml,
@@ -52,8 +52,7 @@ writeModelPhp info path modelName = do
 modelPath :: ModuleInfo -> String -> String
 modelPath info modelName =
     joinPath [
-        codeRootPath info,
-        "Model",
+        modelBasePath info,
         (capitalizePath modelName) ++ ".php"
     ]
 

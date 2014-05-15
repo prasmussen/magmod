@@ -8,7 +8,7 @@ import System.FilePath.Posix (joinPath, takeDirectory)
 import Data.String.Utils (replace)
 import Magento.Module (
     ModuleInfo,
-    basePath,
+    skinBasePath,
     getName)
 import Util (lowercase, writeFileAndPrint)
 import Util.XML (insertXmlIfMissing)
@@ -40,11 +40,7 @@ scopeName "admin" = "adminhtml"
 skinPath :: ModuleInfo -> String -> String -> FilePath
 skinPath info scope name =
     joinPath [
-        basePath info,
-        "skin",
-        scopeName scope,
-        "base",
-        "default",
+        skinBasePath info (scopeName scope),
         lowercase $ getName info,
         (lowercase name)
     ]

@@ -9,7 +9,7 @@ import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Controller (controllerXml, controllerPhp)
 import Magento.Module (
     ModuleInfo,
-    codeRootPath,
+    controllersBasePath,
     getName,
     getNamespace,
     getConfigXml,
@@ -62,8 +62,7 @@ router "frontend" = "standard"
 controllerPath :: ModuleInfo -> String -> String
 controllerPath info controllerName =
     joinPath [
-        codeRootPath info,
-        "controllers",
+        controllersBasePath info,
         (capitalizePath controllerName) ++ "Controller.php"
     ]
 

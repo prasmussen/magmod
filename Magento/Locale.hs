@@ -8,7 +8,7 @@ import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Locale (localeXml)
 import Magento.Module (
     ModuleInfo,
-    basePath,
+    localeBasePath,
     getName,
     getConfigXml,
     getFullName)
@@ -56,9 +56,7 @@ localeFname info =
 localePath :: ModuleInfo -> String -> String
 localePath info localeName =
     joinPath [
-        basePath info,
-        "app",
-        "locale",
+        localeBasePath info,
         localeName,
         localeFname info
     ]

@@ -7,7 +7,7 @@ import Template.Observer (observerXml, observerPhp)
 import Magento.Model (addModel)
 import Magento.Module (
     ModuleInfo,
-    codeRootPath,
+    modelBasePath,
     getName,
     getNamespace,
     getConfigXml,
@@ -54,7 +54,6 @@ scopeName "global" = "global"
 observerPath :: ModuleInfo -> String
 observerPath info =
     joinPath [
-        codeRootPath info,
-        "Model",
+        modelBasePath info,
         "Observer.php"
     ]

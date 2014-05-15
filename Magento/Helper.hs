@@ -8,7 +8,7 @@ import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Helper (helperXml, helperPhp)
 import Magento.Module (
     ModuleInfo,
-    codeRootPath,
+    helperBasePath,
     getName,
     getNamespace,
     getConfigXml,
@@ -51,8 +51,7 @@ writeHelperPhp info path helperName = do
 helperPath :: ModuleInfo -> String -> String
 helperPath info helperName =
     joinPath [
-        codeRootPath info,
-        "Helper",
+        helperBasePath info,
         (capitalizePath helperName) ++ ".php"
     ]
 

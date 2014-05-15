@@ -8,7 +8,7 @@ import System.FilePath.Posix (joinPath, takeDirectory)
 import Template.Block (blockXml, blockPhp)
 import Magento.Module (
     ModuleInfo,
-    codeRootPath,
+    blockBasePath,
     getName,
     getNamespace,
     getConfigXml)
@@ -50,8 +50,7 @@ writeBlockPhp info path blockName = do
 blockPath :: ModuleInfo -> String -> String
 blockPath info blockName =
     joinPath [
-        codeRootPath info,
-        "Block",
+        blockBasePath info,
         (capitalizePath blockName) ++ ".php"
     ]
 

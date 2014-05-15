@@ -19,7 +19,7 @@ import Magento.Module.Version (
 import Magento.Module (
     ModuleInfo,
     findSetupFiles,
-    codeRootPath,
+    setupBasePath,
     getFullName,
     getName,
     getNamespace,
@@ -91,8 +91,7 @@ writeUpgradePhp info path = do
 setupPath :: ModuleInfo -> String
 setupPath info =
     joinPath [
-        codeRootPath info,
-        "sql",
+        setupBasePath info,
         setupIdentifier info
     ]
 
