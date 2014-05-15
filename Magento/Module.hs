@@ -9,6 +9,11 @@ module Magento.Module (
     findSetupFiles,
     getFullName,
     basePath,
+    jsBasePath,
+    skinBasePath,
+    templateBasePath,
+    controllersBasePath,
+    blockBasePath,
     codeRootPath
 ) where
 
@@ -55,6 +60,53 @@ codeRootPath info =
 basePath :: ModuleInfo -> FilePath
 basePath info =
     joinPath $ (takeDirectory $ getConfigXml info):(replicate 6 "..")
+
+jsBasePath :: ModuleInfo -> FilePath
+jsBasePath info = joinPath [basePath info, "js"]
+
+skinBasePath :: ModuleInfo -> String -> FilePath
+skinBasePath info "frontend" = skinBasePath' info "frontend"
+skinBasePath info "adminhtml" = skinBasePath' info "adminhtml"
+
+skinBasePath' :: ModuleInfo -> String -> FilePath
+skinBasePath' info scope =
+    joinPath [
+        basePath info,
+        "skin",
+        scope,
+        "base",
+        "default"
+    ]
+
+templateBasePath :: ModuleInfo -> String -> FilePath
+templateBasePath info "frontend" = templateBasePath' info "frontend"
+templateBasePath info "adminhtml" = templateBasePath' info "adminhtml"
+
+templateBasePath' :: ModuleInfo -> String -> FilePath
+templateBasePath' info scope =
+    joinPath [
+        basePath info,
+        "app",
+        "design",
+        scope,
+        "base",
+        "default",
+        "template"
+    ]
+
+blockBasePath :: ModuleInfo -> FilePath
+blockBasePath info =
+    joinPath [
+        codeRootPath info,
+        "Block"
+    ]
+
+controllersBasePath :: ModuleInfo -> FilePath
+controllersBasePath info =
+    joinPath [
+        codeRootPath info,
+        "controllers"
+    ]
 
 moduleXmlFname :: String -> String -> String
 moduleXmlFname namespace name =

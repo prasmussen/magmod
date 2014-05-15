@@ -8,6 +8,7 @@ import Magento.Controller (addController)
 import Magento.Observer (addObserver)
 import Magento.Resource (addResource)
 import Magento.Layout (addLayout)
+import Magento.Layout.XML (generateLayout)
 import Magento.Template (addTemplate)
 import Magento.Skin (addSkin)
 import Magento.JS (addJs)
@@ -66,6 +67,10 @@ dispatch args = case args of
         addLocaleHandler "admin" name
     ["add", "install"] -> addInstallHandler
     ["add", "upgrade"] -> addUpgradeHandler
+    ["gen", "layout", "frontend"] ->
+        generateLayoutHandler "frontend"
+    ["gen", "layout", "admin"] ->
+        generateLayoutHandler "admin"
     ["clean"] -> cleanHandler
     ["help"] -> helpHandler
     ["-h"] -> helpHandler
@@ -100,6 +105,8 @@ helpHandler = do
         "add locale admin <locale>",
         "add install",
         "add upgrade",
+        "gen layout frontend",
+        "gen layout admin",
         "clean"]
 
 newModuleHandler :: String -> String -> String -> IO ()
@@ -170,6 +177,11 @@ addUpgradeHandler :: IO ()
 addUpgradeHandler =
     withModuleInfo (\moduleInfo ->
         addUpgrade moduleInfo)
+
+generateLayoutHandler :: String -> IO ()
+generateLayoutHandler scope =
+    withModuleInfo (\moduleInfo ->
+        generateLayout moduleInfo scope)
 
 cleanHandler :: IO ()
 cleanHandler = do

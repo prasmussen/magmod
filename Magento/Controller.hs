@@ -1,5 +1,6 @@
 module Magento.Controller (
-    addController
+    addController,
+    parentClassName
 ) where
 
 import Control.Monad (when)

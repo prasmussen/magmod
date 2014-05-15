@@ -1,13 +1,14 @@
 module Util.XML (
     toXmlTree,
     xPathExists,
-    insertXmlIfMissing
+    insertXmlIfMissing,
+    printXml
 ) where
 
 import Control.Monad (when)
 import Control.Category ((>>>))
 import Text.XML.HXT.DOM.TypeDefs (XmlTree)
-import Text.XML.HXT.Arrow.ReadDocument (readDocument, xread)
+import Text.XML.HXT.Arrow.ReadDocument (readDocument, readString, xread)
 import Text.XML.HXT.Arrow.XmlState.RunIOStateArrow (runX)
 import Text.XML.HXT.Arrow.XmlArrow (getElemName, ArrowXml)
 import Text.XML.HXT.Arrow.Edit (indentDoc)
@@ -54,6 +55,14 @@ insertXml fpath xpath xml = do
         indentDoc >>>
         writeDocument [] path
     renameWithBackupAndPrint path fpath
+    return ()
+
+printXml :: String -> IO ()
+printXml xml = do
+    _ <- runX $
+        readString [withPreserveComment True] xml >>>
+        indentDoc >>>
+        writeDocument [] "-"
     return ()
 
 xmlElement :: String -> String

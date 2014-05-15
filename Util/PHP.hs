@@ -1,4 +1,9 @@
 module Util.PHP (
+    PhpClass,
+    readClass,
+    getClassName,
+    getParentName,
+    getPublicFunctions,
     insertPhpMethod
 ) where
 
@@ -10,6 +15,51 @@ import Util (renameWithBackupAndPrint)
 type Parser = [(String -> Bool)]
 
 data Status = NotFound | Found | Done deriving (Eq, Show)
+
+type PhpClass = PhpClassData
+data PhpClassData = PhpClass {
+    getClassName :: String,
+    getParentName :: String,
+    getPublicFunctions :: [String]
+}
+
+readClass :: FilePath -> IO PhpClass
+readClass path = do
+    (name, parent) <- getClassAndParent path
+    fns <- listPublicFunctions path
+    return PhpClass {
+        getClassName=name,
+        getParentName=parent,
+        getPublicFunctions=fns
+    }
+
+getClassAndParent :: FilePath -> IO (String, String)
+getClassAndParent path = do
+    contents <- readFile path
+    return $ case (classesAndParents (lines contents) []) of
+        [] -> ("", "")
+        (x:_) -> x
+
+listPublicFunctions :: FilePath -> IO [String]
+listPublicFunctions path = do
+    contents <- readFile path
+    return $ publicFunctions (lines contents) []
+
+classesAndParents :: [String] -> [(String, String)] -> [(String, String)]
+classesAndParents [] xs = xs
+classesAndParents (line:lines) xs =
+    case (take 4 $ words line) of
+        ["class", name, "extends", parent] ->
+            classesAndParents lines ((name, parent):xs)
+        _ ->
+            classesAndParents lines xs
+
+publicFunctions :: [String] -> [String] -> [String]
+publicFunctions [] names = names
+publicFunctions (line:lines) names =
+    case (take 3 $ words line) of
+        ["public", "function", name] -> publicFunctions lines (name:names)
+        _ -> publicFunctions lines names
 
 insertPhpMethod :: FilePath -> String -> IO ()
 insertPhpMethod path payload = do

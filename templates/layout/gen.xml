@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<layout version="0.1.0">
+  {{#controllers}}
+  <{{handle}}>
+    <reference name="head">
+      {{#stylesheets}}
+      <action method="addCss"><stylesheet>{{path}}</stylesheet></action>
+      {{/stylesheets}}
+
+      {{#items}}
+      <action method="addItem"><type>skin_js</type><name>{{path}}</name></action>
+      {{/items}}
+
+      {{#scripts}}
+      <action method="addJs"><script>{{path}}</script></action>
+      {{/scripts}}
+    </reference>
+
+    <reference name="content">
+      {{#blocks}}
+      <block type="{{block}}" template="{{template}}" name="{{name}}"/>
+      {{/blocks}}
+    </reference>
+  </{{handle}}>
+  {{/controllers}}
+</layout>
