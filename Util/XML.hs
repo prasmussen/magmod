@@ -2,7 +2,8 @@ module Util.XML (
     toXmlTree,
     xPathExists,
     insertXmlIfMissing,
-    printXml
+    printXml,
+    indentXml
 ) where
 
 import Control.Monad (when)
@@ -12,12 +13,16 @@ import Text.XML.HXT.Arrow.ReadDocument (readDocument, readString, xread)
 import Text.XML.HXT.Arrow.XmlState.RunIOStateArrow (runX)
 import Text.XML.HXT.Arrow.XmlArrow (getElemName, ArrowXml)
 import Text.XML.HXT.Arrow.Edit (indentDoc)
-import Text.XML.HXT.Arrow.WriteDocument (writeDocument)
-import Text.XML.HXT.Arrow.XmlState.SystemConfig (withPreserveComment)
+import Text.XML.HXT.Arrow.WriteDocument (writeDocument, writeDocumentToString)
+import Text.XML.HXT.Arrow.XmlState.SystemConfig (
+    withPreserveComment,
+    withOutputEncoding,
+    withXmlPi)
 import Text.XML.HXT.XPath.Arrows (getXPathTrees, processXPathTrees)
 import Control.Arrow.ArrowList (constA, this)
 import Control.Arrow.ArrowTree (insertChildrenAt)
 import Data.String.Utils (join, split)
+import Data.String.EncodingNames (utf8)
 import Util (renameWithBackupAndPrint, tmpFname)
 
 toXmlTree :: (ArrowXml a) => String -> a b XmlTree
@@ -56,6 +61,14 @@ insertXml fpath xpath xml = do
         writeDocument [] path
     renameWithBackupAndPrint path fpath
     return ()
+
+indentXml :: String -> IO String
+indentXml xml = do
+    [rc] <- runX $
+        readString [withPreserveComment True] xml >>>
+        indentDoc >>>
+        writeDocumentToString [withOutputEncoding utf8, withXmlPi True]
+    return rc
 
 printXml :: String -> IO ()
 printXml xml = do

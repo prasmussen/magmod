@@ -32,4 +32,5 @@ executable magmod
                        hastache ==0.6.*,
                        hxt ==9.3.*,
                        hxt-xpath ==9.1.*,
+                       hxt-unicode ==9.0.*,
                        Glob ==0.7.*

@@ -14,7 +14,7 @@ import Magento.Module (
     getConfigXml,
     getFullName)
 import Util (lowercase, writeFileAndPrint)
-import Util.XML (insertXmlIfMissing)
+import Util.XML (insertXmlIfMissing, indentXml)
 
 
 addLayout :: ModuleInfo -> String -> IO ()
@@ -40,7 +40,7 @@ writeLayoutXmlIfMissing path = do
 
 writeLayoutXml :: FilePath -> IO ()
 writeLayoutXml path = do
-    xml <- layoutXml
+    xml <- layoutXml >>= indentXml
     writeFileAndPrint path xml
 
 xpath :: String -> String

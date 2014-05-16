@@ -40,7 +40,7 @@ layoutConfigXml moduleName =
     render "layout/config.xml" (LayoutXmlTemplate moduleName)
 
 layoutXml :: IO String
-layoutXml = render "layout/layout.xml" (LayoutXmlTemplate "")
+layoutXml = render "layout/layout.xml" $ Layout [] [] [] [] []
 
 genXml :: [String]
        -> [String]
@@ -48,8 +48,15 @@ genXml :: [String]
        -> [String]
        -> [(String, String, String)]
        -> IO String
+genXml [] stylesheets items scripts blocks =
+    render "layout/layout.xml" $ Layout
+        []
+        (map File stylesheets)
+        (map File items)
+        (map File scripts)
+        (map (\(block, template, name) -> Block block template name) blocks)
 genXml handles stylesheets items scripts blocks =
-    render "layout/gen.xml" $ Layout
+    render "layout/controllers.xml" $ Layout
         (map Controller handles)
         (map File stylesheets)
         (map File items)
