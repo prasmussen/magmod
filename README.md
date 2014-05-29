@@ -6,6 +6,11 @@ magmod
 A magento module generator
 
 ## Installation
+- Save the 'magmod' binary to a location in your PATH (i.e. `/usr/local/bin/`)
+
+#### Downloads
+- [magmod-osx-1.0.0-x64](https://drive.google.com/uc?id=0B3X9GlR6EmbnaFo5TllrbFdITUk)
+- [magmod-linux-1.0.0-x64](https://drive.google.com/uc?id=0B3X9GlR6EmbnLTBocG1sMXhWclk)
 
 #### Build from source
     cabal install --only-dependencies
