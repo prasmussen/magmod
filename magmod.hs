@@ -71,6 +71,7 @@ dispatch args = case args of
         generateLayoutHandler "frontend"
     ["gen", "layout", "admin"] ->
         generateLayoutHandler "admin"
+    ["version"] -> versionHandler
     ["clean"] -> cleanHandler
     ["help"] -> helpHandler
     ["-h"] -> helpHandler
@@ -107,6 +108,7 @@ helpHandler = do
         "add upgrade",
         "gen layout frontend",
         "gen layout admin",
+        "version",
         "clean"]
 
 newModuleHandler :: String -> String -> String -> IO ()
@@ -182,6 +184,11 @@ generateLayoutHandler :: String -> IO ()
 generateLayoutHandler scope =
     withModuleInfo (\moduleInfo ->
         generateLayout moduleInfo scope)
+
+versionHandler :: IO ()
+versionHandler = do
+    name <- getProgName
+    putStrLn $ name ++ " " ++ "1.0.0"
 
 cleanHandler :: IO ()
 cleanHandler = do
