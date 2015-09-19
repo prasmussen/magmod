@@ -28,7 +28,7 @@ addLocale info scope localeName = do
 
 insertLocaleXmlIfMissing :: ModuleInfo -> String -> IO ()
 insertLocaleXmlIfMissing info scope = do
-    xml <- localeXml (lowercase $ getFullName info) (localeFname info)
+    xml <- localeXml (getFullName info) (localeFname info)
     insertXmlIfMissing (getConfigXml info) (xpath scope) xml
 
 createLocaleCsvIfMissing :: ModuleInfo -> String -> IO ()
