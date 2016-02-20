@@ -188,7 +188,7 @@ generateLayoutHandler scope =
 versionHandler :: IO ()
 versionHandler = do
     name <- getProgName
-    putStrLn $ name ++ " " ++ "1.0.1"
+    putStrLn $ name ++ " " ++ "1.0.2"
 
 cleanHandler :: IO ()
 cleanHandler = do
