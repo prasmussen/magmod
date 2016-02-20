@@ -25,8 +25,8 @@ controllerXml moduleName fullModuleName router "frontend" =
 controllerXml moduleName fullModuleName router "admin" =
     render "controller/admin.xml" (CtrlXmlTemplate moduleName fullModuleName router)
 
-controllerPhp :: String -> String -> IO String
-controllerPhp className parentClassName =
-    render
-        "controller/controller.php"
-        (CtrlPhpTemplate className parentClassName)
+controllerPhp :: String -> String -> String -> IO String
+controllerPhp className parentClassName "frontend" =
+    render "controller/frontend.php" (CtrlPhpTemplate className parentClassName)
+controllerPhp className parentClassName "admin" =
+    render "controller/admin.php" (CtrlPhpTemplate className parentClassName)

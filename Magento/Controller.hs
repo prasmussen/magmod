@@ -48,7 +48,7 @@ writeCtrlPhpIfMissing info path scope controllerName = do
 writeCtrlPhp :: ModuleInfo -> FilePath -> String -> String -> IO ()
 writeCtrlPhp info path scope controllerName = do
     php <- controllerPhp
-        (className info scope controllerName) (parentClassName scope)
+        (className info scope controllerName) (parentClassName scope) scope
     writeFileAndPrint path php
 
 xpath :: String -> String
