@@ -1,7 +1,7 @@
 <{{eventName}}>
   <observers>
     <{{moduleName}}>
-      <type>singelton</type>
+      <type>singleton</type>
       <class>{{moduleName}}/observer</class>
       <method>{{methodName}}</method>
     </{{moduleName}}>
