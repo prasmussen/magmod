@@ -19,11 +19,11 @@ data CtrlPhpTemplate = CtrlPhpTemplate {
     parentClassName :: String
 } deriving (Data, Typeable)
 
-controllerXml :: String -> String -> String -> IO String
-controllerXml moduleName fullModuleName router =
-    render
-        "controller/controller.xml"
-        (CtrlXmlTemplate moduleName fullModuleName router)
+controllerXml :: String -> String -> String -> String -> IO String
+controllerXml moduleName fullModuleName router "frontend" =
+    render "controller/frontend.xml" (CtrlXmlTemplate moduleName fullModuleName router)
+controllerXml moduleName fullModuleName router "admin" =
+    render "controller/admin.xml" (CtrlXmlTemplate moduleName fullModuleName router)
 
 controllerPhp :: String -> String -> IO String
 controllerPhp className parentClassName =

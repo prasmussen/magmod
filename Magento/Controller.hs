@@ -31,12 +31,12 @@ addController info scope controllerName = do
 insertCtrlXmlIfMissing :: ModuleInfo -> String -> IO ()
 insertCtrlXmlIfMissing info scope = do
     xml <- controllerXml
-        (lowercase $ getName info) (getFullName info) (router scope)
+        (lowercase $ getName info) (getFullName info) (router scope) scope
     insertXmlIfMissing (getConfigXml info) (xpath scope) xml
 
 createCtrlPhpIfMissing :: ModuleInfo -> String -> String -> IO ()
 createCtrlPhpIfMissing info scope controllerName =
-    let path = controllerPath info controllerName in do
+    let path = controllerPath info scope controllerName in do
         createDirectoryIfMissing True (takeDirectory path)
         writeCtrlPhpIfMissing info path scope controllerName
 
@@ -48,7 +48,7 @@ writeCtrlPhpIfMissing info path scope controllerName = do
 writeCtrlPhp :: ModuleInfo -> FilePath -> String -> String -> IO ()
 writeCtrlPhp info path scope controllerName = do
     php <- controllerPhp
-        (className info controllerName) (parentClassName scope)
+        (className info scope controllerName) (parentClassName scope)
     writeFileAndPrint path php
 
 xpath :: String -> String
@@ -59,10 +59,17 @@ router :: String -> String
 router "admin" = "admin"
 router "frontend" = "standard"
 
-controllerPath :: ModuleInfo -> String -> String
-controllerPath info controllerName =
+controllerPath :: ModuleInfo -> String -> String -> String
+controllerPath info "frontend" controllerName =
     joinPath [
         controllersBasePath info,
+        (capitalizePath controllerName) ++ "Controller.php"
+    ]
+controllerPath info "admin" controllerName =
+    joinPath [
+        controllersBasePath info,
+        "Adminhtml",
+        capitalize $ getName info,
         (capitalizePath controllerName) ++ "Controller.php"
     ]
 
@@ -76,10 +83,17 @@ classNamePrefix info =
         capitalize $ getName info
     ]
 
-className :: ModuleInfo -> String -> String
-className info controllerName =
+className :: ModuleInfo -> String -> String -> String
+className info "frontend" controllerName =
     join "_" [
         classNamePrefix info,
+        (classNameFromPath controllerName) ++ "Controller"
+    ]
+className info "admin" controllerName =
+    join "_" [
+        classNamePrefix info,
+        "Adminhtml",
+        capitalize $ getName info,
         (classNameFromPath controllerName) ++ "Controller"
     ]
 

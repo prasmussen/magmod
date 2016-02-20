@@ -1,0 +1,9 @@
+<routers>
+  <adminhtml>
+    <args>
+      <modules>
+        <{{moduleName}} before="Mage_Adminhtml">{{fullModuleName}}_Adminhtml</{{moduleName}}>
+      </modules>
+    </args>
+  </adminhtml>
+</routers>
