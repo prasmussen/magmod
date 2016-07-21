@@ -14,7 +14,7 @@ class {{className}} extends {{parentClassName}} {
 
     public function jsonAction() {
         $data = json_encode(array('foo' => 'bar'));
-        $this->getResponse()->setHeader('Content-type', 'application/json');
+        $this->getResponse()->setHeader('Content-type', 'application/json; charset=utf-8');
         $this->getResponse()->setBody($data);
     }
 
@@ -24,7 +24,7 @@ class {{className}} extends {{parentClassName}} {
             ->setTemplate('modulename/foo.phtml')
             ->toHtml();
 
-        $this->getResponse()->setHeader('Content-type', 'text/html');
+        $this->getResponse()->setHeader('Content-type', 'text/html; charset=utf-8');
         $this->getResponse()->setBody($html);
     }
 }
